@@ -1,0 +1,21 @@
+[
+      {"Schema 名稱":"dbo","資料表名稱":"SQL_XML","資料表說明":"儲存 SQL XML 資訊的資料表","欄位名稱":"sql_file_name","欄位說明":"SQL 檔案名s稱"},
+      {"Schema 名稱":"dbo","資料表名稱":"SQL_XML","資料表說明":"儲存 SQL XML 資訊的資料表","欄位名稱":"sql_file_path","欄位說明":"SQL 檔案路徑"},
+      {"Schema 名稱":"dbo","資料表名稱":"SQL_XML","資料表說明":"儲存 SQL XML 資訊的資料表","欄位名稱":"sql_nodes","欄位說明":"SQL 節點"},
+      {"Schema 名稱":"dbo","資料表名稱":"SQL_XML","資料表說明":"儲存 SQL XML 資訊的資料表","欄位名稱":"sql_tag","欄位說明":"SQL 標籤"},
+      {"Schema 名稱":"dbo","資料表名稱":"SQL_XML","資料表說明":"儲存 SQL XML 資訊的資料表","欄位名稱":"sql_update_time","欄位說明":"SQL 更新時間"},
+      {"Schema 名稱":"dbo","資料表名稱":"SQL_XML","資料表說明":"儲存 SQL XML 資訊的資料表","欄位名稱":"sql_value","欄位說明":"SQL 值"},
+      {"Schema 名稱":"dbo","資料表名稱":"SQL_XML_v2","資料表說明":"儲存 SQL XML 資訊的資料表","欄位名稱":"sql_file_name","欄位說明":"SQL 檔案名稱"},
+      {"Schema 名稱":"dbo","資料表名稱":"SQL_XML_v2","資料表說明":"儲存 SQL XML 資訊的資料表","欄位名稱":"sql_file_path","欄位說明":"SQL 檔案路徑"},
+      {"Schema 名稱":"dbo","資料表名稱":"SQL_XML_v2","資料表說明":"儲存 SQL XML 資訊的資料表","欄位名稱":"sql_nodes","欄位說明":"SQL 節點"},
+      {"Schema 名稱":"dbo","資料表名稱":"SQL_XML_v2","資料表說明":"儲存 SQL XML 資訊的資料表","欄位名稱":"sql_tag","欄位說明":"SQL 標籤"},
+      {"Schema 名稱":"dbo","資料表名稱":"SQL_XML_v2","資料表說明":"儲存 SQL XML 資訊的資料表","欄位名稱":"sql_update_time","欄位說明":"SQL 更新時間"},
+      {"Schema 名稱":"dbo","資料表名稱":"SQL_XML_v2","資料表說明":"儲存 SQL XML 資訊的資料表","欄位名稱":"sql_value","欄位說明":"SQL 值"},
+      {"Schema 名稱":"dbo","資料表名稱":"SQL_XML_v3","資料表說明":"儲存 SQL XML 資訊的資料表","欄位名稱":"sql_file_name","欄位說明":"SQL 檔案名稱"},
+      {"Schema 名稱":"dbo","資料表名稱":"SQL_XML_v3","資料表說明":"儲存 SQL XML 資訊的資料表","欄位名稱":"sql_file_path","欄位說明":"SQL 檔案路徑"},
+      {"Schema 名稱":"dbo","資料表名稱":"SQL_XML_v3","資料表說明":"儲存 SQL XML 資訊的資料表","欄位名稱":"sql_nodes","欄位說明":"SQL 節點"},
+      {"Schema 名稱":"dbo","資料表名稱":"SQL_XML_v3","資料表說明":"儲存 SQL XML 資訊的資料表","欄位名稱":"sql_tag","欄位說明":"SQL 標籤"},
+      {"Schema 名稱":"dbo","資料表名稱":"SQL_XML_v3","資料表說明":"儲存 SQL XML 資訊的資料表","欄位名稱":"sql_update_time","欄位說明":"SQL 更新時間"},
+      {"Schema 名稱":"dbo","資料表名稱":"SQL_XML_v3","資料表說明":"儲存 SQL XML 資訊的資料表","欄位名稱":"sql_value","欄位說明":"SQL 值"}
+
+    ]
