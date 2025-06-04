@@ -1,0 +1,265 @@
+body {
+      font-family: "Segoe UI", "微軟正黑體", sans-serif;
+      background: linear-gradient(to right, #fdfbfb, #ebedee);
+      padding: 40px;
+      color: #333;
+    }
+
+    h2 {
+      color: #2c3e50;
+      text-align: center;
+      font-size: 28px;
+      margin-bottom: 30px;
+    }
+
+    #searchInput, #searchInput2, #searchInput3, #searchInput4 {
+      display: block;
+      margin: 0 auto;
+      width: 60%;
+      padding: 12px 20px;
+      font-size: 18px;
+      border: 2px solid #8e44ad;
+      border-radius: 30px;
+      outline: none;
+      transition: 0.3s;
+    }
+
+    #searchInput:focus, #searchInput2:focus, #searchInput3:focus, #searchInput4:focus {
+      box-shadow: 0 0 8px #9b59b6;
+    }
+    table {
+      margin: 30px auto 0;
+      width: 90%;
+      border-collapse: separate;
+      border-spacing: 0;
+      border-radius: 10px;
+      overflow: hidden;
+      background-color: #ffffff;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    th {
+      background-color: #8e44ad;
+      color: #fff;
+      padding: 12px;
+      font-size: 16px;
+    }
+
+    td {
+      padding: 12px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    tr:hover {
+      background-color: #f9f0ff;
+    }
+
+    /* 新增選擇器樣式 */
+    .field-selector {
+      margin-right: 8px;
+      padding: 4px 8px;
+      border: 1px solid #8e44ad;
+      border-radius: 4px;
+      background-color: white;
+      color: #8e44ad;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .field-selector.select {
+      background-color: #27ae60;
+      color: white;
+      border-color: #27ae60;
+    }
+
+    .field-selector.where {
+      background-color: #e74c3c;
+      color: white;
+      border-color: #e74c3c;
+    }
+
+    .field-selector.both {
+      background-color: #f39c12;
+      color: white;
+      border-color: #f39c12;
+    }
+
+    .field-selector.joinkey {
+      background-color: #2980b9;
+      color: white;
+      border-color: #2980b9;
+    }
+
+    .field-row {
+      cursor: pointer;
+    }
+
+    .field-row.selected-select {
+      background-color: #e8f5e8 !important;
+    }
+
+    .field-row.selected-where {
+      background-color: #ffeaea !important;
+    }
+
+    .field-row.selected-both {
+      background-color: #fff8e1 !important;
+    }
+
+    .field-row.selected-joinkey {
+      background-color: #e3f2fd !important;
+    }
+
+    .field-selector.joinkeysel {
+      background-color: #16a085;
+      color: white;
+      border-color: #16a085;
+    }
+
+    .field-row.selected-joinkeysel {
+      background-color: #e0f7fa !important;
+    }
+
+    .controls {
+      text-align: center;
+      margin: 20px;
+    }
+
+    .btn {
+      background: linear-gradient(45deg, #8e44ad, #9b59b6);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 25px;
+      font-size: 14px;
+      cursor: pointer;
+      margin: 0 10px;
+      transition: all 0.3s;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .sql-section {
+      width: 90%;
+      margin: 20px auto;
+      background-color: #fef6ff;
+      border: 2px dashed #bb6bd9;
+      border-radius: 10px;
+      padding: 15px;
+      font-size: 16px;
+      color: #6c3483;
+      animation: fadeIn 0.4s ease-in-out;
+    }
+
+    .sql-tabs {
+      margin-bottom: 15px;
+    }
+
+    .tab-btn {
+      background: #bb6bd9;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      margin-right: 5px;
+      border-radius: 5px 5px 0 0;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .tab-btn.active {
+      background: #8e44ad;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    pre {
+      background-color: #fdfbff;
+      padding: 15px;
+      border-radius: 8px;
+      font-family: Consolas, monospace;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      border: 1px solid #e0e0e0;
+      margin: 10px 0;
+    }
+
+    .copy-btn {
+      float: right;
+      background: #27ae60;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 12px;
+      margin-bottom: 10px;
+    }
+
+    .copy-btn:hover {
+      background: #2ecc71;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .selection-info {
+      background: #e8f5e8;
+      border: 1px solid #27ae60;
+      border-radius: 5px;
+      padding: 10px;
+      margin: 15px 0;
+      color: #2c3e50;
+    }
+
+    .selection-info .select-fields {
+      color: #27ae60;
+      font-weight: bold;
+    }
+
+    .selection-info .where-fields {
+      color: #e74c3c;
+      font-weight: bold;
+    }
+
+    .table-section {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      margin: 15px 0;
+      padding: 15px;
+      background-color: #f9f9f9;
+    }
+
+    .table-title {
+      font-weight: bold;
+      color: #8e44ad;
+      margin-bottom: 10px;
+      border-bottom: 2px solid #8e44ad;
+      padding-bottom: 5px;
+    }
+
+    .warning {
+      background-color: #fff3cd;
+      border: 1px solid #ffeaa7;
+      color: #d68910;
+      padding: 10px;
+      border-radius: 5px;
+      margin: 10px 0;
+    }

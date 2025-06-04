@@ -2,286 +2,21 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
-  <title>B2B資料表欄位查詢</title>
-  <style>
-    body {
-      font-family: "Segoe UI", "微軟正黑體", sans-serif;
-      background: linear-gradient(to right, #fdfbfb, #ebedee);
-      padding: 40px;
-      color: #333;
-    }
-
-    h2 {
-      color: #2c3e50;
-      text-align: center;
-      font-size: 28px;
-      margin-bottom: 30px;
-    }
-
-    #searchInput {
-      display: block;
-      margin: 0 auto;
-      width: 60%;
-      padding: 12px 20px;
-      font-size: 18px;
-      border: 2px solid #8e44ad;
-      border-radius: 30px;
-      outline: none;
-      transition: 0.3s;
-    }
-
-    #searchInput:focus {
-      box-shadow: 0 0 8px #9b59b6;
-    }
-
-    table {
-      margin: 30px auto 0;
-      width: 90%;
-      border-collapse: separate;
-      border-spacing: 0;
-      border-radius: 10px;
-      overflow: hidden;
-      background-color: #ffffff;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      animation: fadeIn 0.5s ease-in-out;
-    }
-
-    th {
-      background-color: #8e44ad;
-      color: #fff;
-      padding: 12px;
-      font-size: 16px;
-    }
-
-    td {
-      padding: 12px;
-      border-bottom: 1px solid #f0f0f0;
-    }
-
-    tr:hover {
-      background-color: #f9f0ff;
-    }
-
-    /* 新增選擇器樣式 */
-    .field-selector {
-      margin-right: 8px;
-      padding: 4px 8px;
-      border: 1px solid #8e44ad;
-      border-radius: 4px;
-      background-color: white;
-      color: #8e44ad;
-      font-size: 12px;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-
-    .field-selector.select {
-      background-color: #27ae60;
-      color: white;
-      border-color: #27ae60;
-    }
-
-    .field-selector.where {
-      background-color: #e74c3c;
-      color: white;
-      border-color: #e74c3c;
-    }
-
-    .field-selector.both {
-      background-color: #f39c12;
-      color: white;
-      border-color: #f39c12;
-    }
-
-    .field-selector.joinkey {
-      background-color: #2980b9;
-      color: white;
-      border-color: #2980b9;
-    }
-
-    .field-row {
-      cursor: pointer;
-    }
-
-    .field-row.selected-select {
-      background-color: #e8f5e8 !important;
-    }
-
-    .field-row.selected-where {
-      background-color: #ffeaea !important;
-    }
-
-    .field-row.selected-both {
-      background-color: #fff8e1 !important;
-    }
-
-    .field-row.selected-joinkey {
-      background-color: #e3f2fd !important;
-    }
-
-    .field-selector.joinkeysel {
-      background-color: #16a085;
-      color: white;
-      border-color: #16a085;
-    }
-
-    .field-row.selected-joinkeysel {
-      background-color: #e0f7fa !important;
-    }
-
-    .controls {
-      text-align: center;
-      margin: 20px;
-    }
-
-    .btn {
-      background: linear-gradient(45deg, #8e44ad, #9b59b6);
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 25px;
-      font-size: 14px;
-      cursor: pointer;
-      margin: 0 10px;
-      transition: all 0.3s;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    }
-
-    .btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-    }
-
-    .btn:active {
-      transform: translateY(0);
-    }
-
-    .sql-section {
-      width: 90%;
-      margin: 20px auto;
-      background-color: #fef6ff;
-      border: 2px dashed #bb6bd9;
-      border-radius: 10px;
-      padding: 15px;
-      font-size: 16px;
-      color: #6c3483;
-      animation: fadeIn 0.4s ease-in-out;
-    }
-
-    .sql-tabs {
-      margin-bottom: 15px;
-    }
-
-    .tab-btn {
-      background: #bb6bd9;
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      margin-right: 5px;
-      border-radius: 5px 5px 0 0;
-      cursor: pointer;
-      font-size: 14px;
-    }
-
-    .tab-btn.active {
-      background: #8e44ad;
-    }
-
-    .tab-content {
-      display: none;
-    }
-
-    .tab-content.active {
-      display: block;
-    }
-
-    pre {
-      background-color: #fdfbff;
-      padding: 15px;
-      border-radius: 8px;
-      font-family: Consolas, monospace;
-      overflow-x: auto;
-      white-space: pre-wrap;
-      border: 1px solid #e0e0e0;
-      margin: 10px 0;
-    }
-
-    .copy-btn {
-      float: right;
-      background: #27ae60;
-      color: white;
-      border: none;
-      padding: 5px 10px;
-      border-radius: 3px;
-      cursor: pointer;
-      font-size: 12px;
-      margin-bottom: 10px;
-    }
-
-    .copy-btn:hover {
-      background: #2ecc71;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .selection-info {
-      background: #e8f5e8;
-      border: 1px solid #27ae60;
-      border-radius: 5px;
-      padding: 10px;
-      margin: 15px 0;
-      color: #2c3e50;
-    }
-
-    .selection-info .select-fields {
-      color: #27ae60;
-      font-weight: bold;
-    }
-
-    .selection-info .where-fields {
-      color: #e74c3c;
-      font-weight: bold;
-    }
-
-    .table-section {
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      margin: 15px 0;
-      padding: 15px;
-      background-color: #f9f9f9;
-    }
-
-    .table-title {
-      font-weight: bold;
-      color: #8e44ad;
-      margin-bottom: 10px;
-      border-bottom: 2px solid #8e44ad;
-      padding-bottom: 5px;
-    }
-
-    .warning {
-      background-color: #fff3cd;
-      border: 1px solid #ffeaa7;
-      color: #d68910;
-      padding: 10px;
-      border-radius: 5px;
-      margin: 10px 0;
-    }
-  </style>
+  <title>資料表欄位查詢</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <h2>📊 資料表欄位中英對照查詢系統</h2>
+  <h2>📊 B2B資料表欄位中英對照查詢系統</h2>
 
-  <input type="text" id="searchInput" placeholder="🔍 請輸入欄位關鍵字（中英文皆可）">
-
+  <input type="text" id="searchInput" placeholder="🔍 請輸入資料表名稱關鍵字（英文）">
+  <input type="text" id="searchInput2" placeholder="🔍 請輸入欄位名稱關鍵字（英文）">
+  <input type="text" id="searchInput4" placeholder="🔍 請輸入資料表中文說明關鍵字（中文）">
+  <input type="text" id="searchInput3" placeholder="🔍 請輸入欄位中文說明關鍵字（中文）">
   <div class="controls">
     <button class="btn" onclick="selectAllForSelect()">🔍 全選為 SELECT</button>
     <button class="btn" onclick="selectAllForWhere()">🎯 全選為 WHERE</button>
-    <button class="btn" onclick="selectAllForBoth()">🟧 全選為 BOTH</button>
+    <button class="btn" onclick="selectAllForBoth()">🟧 全選為 SELECT + WHERE</button>
     <button class="btn" onclick="clearSelection()">❌ 清除選擇</button>
     <button class="btn" onclick="generateSQL()">⚡ 生成 SQL</button>
   </div>
@@ -289,7 +24,7 @@
   <table id="resultTable">
     <thead>
       <tr>
-        <th>SELECT / WHERE</th>
+        <th>欄位組合選項</th>
         <th>Schema 名稱</th>
         <th>資料表名稱</th>
         <th>資料表說明</th>
@@ -348,21 +83,21 @@
     const API_URL = "https://your-api-endpoint.com/getSqlFields"; // 請替換為實際 API
 
     function loadDataFromJson() {
-      fetchWithTimeout('data.json')
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-          return response.json();
-        })
-        .then(jsonData => {
-          data = jsonData;
-          console.log('Data loaded from data.json:', data);
-        })
-        .catch(error => {
-          console.error('Error loading data from data.json:', error);
-          errorMessageDiv.textContent = "⚠️ 無法載入資料，請檢查檔案是否存在或網路連線是否正常。";
-        });
+    fetchWithTimeout('data.json')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(jsonData => {
+        data = jsonData;
+        console.log('Data loaded from data.json:', data);
+      })
+      .catch(error => {
+        console.error('Error loading data from data.json:', error);
+        errorMessageDiv.textContent = "⚠️ 無法載入資料，請檢查檔案是否存在或網路連線是否正常。";
+      });
     }
 
     fetchWithTimeout(API_URL)
@@ -382,52 +117,94 @@
       });
 
     const input = document.getElementById("searchInput");
+    const input2 = document.getElementById("searchInput2");
+    const input3 = document.getElementById("searchInput3");
+    const input4 = document.getElementById("searchInput4");
     const tbody = document.querySelector("#resultTable tbody");
     const queryDiv = document.getElementById("queryResult");
     let currentMatched = [];
     let selectedFields = new Map(); // 改用 Map 來儲存欄位資訊，key: fieldName, value: {type, tableInfo}
 
-    input.addEventListener("input", () => {
-      const keyword = input.value.trim().toLowerCase();
+    function renderTable(filteredData) {
       tbody.innerHTML = "";
       queryDiv.style.display = "none";
       selectedFields.clear();
 
-      currentMatched = data.filter(row =>
-        row["欄位名稱"].toLowerCase().includes(keyword) ||
-        row["欄位說明"].toLowerCase().includes(keyword)
-      );
+      currentMatched = filteredData;
 
       if (currentMatched.length > 0) {
-        currentMatched.forEach((row, index) => {
-          const tr = document.createElement("tr");
-          tr.className = "field-row";
-          tr.dataset.index = index;
+      currentMatched.forEach((row, index) => {
+        const tr = document.createElement("tr");
+        tr.className = "field-row";
+        tr.dataset.index = index;
 
-          // 加入選擇器
-          const selectorTd = document.createElement("td");
-          const selector = document.createElement("button");
-          selector.className = "field-selector";
-          selector.textContent = "未選擇";
-          selector.dataset.field = row["欄位名稱"];
-          selector.dataset.table = row["資料表名稱"];
-          selector.dataset.schema = row["Schema 名稱"];
-          selector.dataset.state = "none"; // none, select, where
-          selector.addEventListener("click", handleFieldSelection);
-          selectorTd.appendChild(selector);
-          tr.appendChild(selectorTd);
+        // 加入選擇器
+        const selectorTd = document.createElement("td");
+        const selector = document.createElement("button");
+        selector.className = "field-selector";
+        selector.textContent = "未選擇";
+        selector.dataset.field = row["欄位名稱"];
+        selector.dataset.table = row["資料表名稱"];
+        selector.dataset.schema = row["Schema 名稱"];
+        selector.dataset.state = "none"; // none, select, where, both
+        selector.addEventListener("click", handleFieldSelection);
+        selectorTd.appendChild(selector);
+        tr.appendChild(selectorTd);
 
-          // 加入其他欄位
-          for (const key in row) {
-            const td = document.createElement("td");
-            td.textContent = row[key];
-            tr.appendChild(td);
-          }
+        // 加入其他欄位
+        for (const key in row) {
+        const td = document.createElement("td");
+        td.textContent = row[key];
+        tr.appendChild(td);
+        }
 
-          tbody.appendChild(tr);
-        });
+        tbody.appendChild(tr);
+      });
       }
-    });
+    }
+
+    function filterData() {
+      // 處理逗號分割的關鍵字
+      const getKeywords = (inputValue) => {
+        return inputValue.trim()
+          .split(',')
+          .map(kw => kw.trim().toLowerCase())
+          .filter(kw => kw);
+      };
+
+      const keywords1 = getKeywords(input.value);   // 對應「資料表名稱」
+      const keywords2 = getKeywords(input2.value);  // 對應「欄位名稱」  
+      const keywords3 = getKeywords(input3.value);  // 對應「欄位說明」
+      const keywords4 = getKeywords(input4.value);  // 對應「資料表說明」
+
+      let filtered = data;
+
+      // 7種可能的組合（2^3 - 1，排除全空的情況）
+      
+      const filters = [
+      { value: keywords1, key: "資料表名稱" },
+      { value: keywords2, key: "欄位名稱" },
+      { value: keywords3, key: "欄位說明" },
+      { value: keywords4, key: "資料表說明"}
+      ];
+      filtered = data.filter(row =>
+        filters.every(f =>
+          f.value.length === 0 ||
+          f.value.some(kw => {
+            const cell = (row[f.key] || "").toString().trim().toLowerCase();
+            return cell.includes(kw);
+          })
+        )
+      );
+      // 如果所有輸入框都是空的，filtered 保持為原始 data
+      
+      renderTable(filtered);
+    }
+
+    input.addEventListener("input", filterData);
+    input2.addEventListener("input", filterData);
+    input3.addEventListener("input", filterData);
+    input4.addEventListener("input", filterData);
 
     function handleFieldSelection(e) {
       e.stopPropagation();
@@ -466,7 +243,7 @@
           break;
         case "where":
           selector.dataset.state = "both";
-          selector.textContent = "BOTH";
+          selector.textContent = "SELECT+WHERE";
           selector.className = "field-selector both";
           selectedFields.set(fieldKey, {
             type: "both",
@@ -575,7 +352,7 @@
         
         // 設置為 BOTH (同時 SELECT 和 WHERE)
         selector.dataset.state = "both";
-        selector.textContent = "BOTH";
+        selector.textContent = "SELECT+WHERE";
         selector.className = "field-selector both";
         selectedFields.set(fieldKey, {
           type: "both",
@@ -694,7 +471,7 @@
       // SELECT SQL
       let selectSql = "";
       if (tableGroup.selectFields.length > 0) {
-        const columns = tableGroup.selectFields.map(field => `    [${field.fieldName}]`).join(",\n");
+        const columns = tableGroup.selectFields.map(field => `    [${field.fieldName}] /* ${field.description} */`).join(",\n");
         selectSql = `SELECT\n${columns}\nFROM ${fullTableName}`;
         
         if (tableGroup.whereFields.length > 0) {
