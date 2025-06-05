@@ -1,241 +1,293 @@
 body {
-      font-family: "Segoe UI", "微軟正黑體", sans-serif;
-      background: linear-gradient(to right, #fdfbfb, #ebedee);
-      padding: 40px;
-      color: #333;
+      font-family: 'Roboto', 'Noto Sans TC', Arial, sans-serif;
+      background: #f5f5f5;
+      color: #222;
+      margin: 0;
+      padding: 0;
     }
 
     h2 {
-      color: #2c3e50;
+      color: #1976d2;
+      font-weight: 500;
+      letter-spacing: 1px;
+      margin-top: 32px;
+      margin-bottom: 24px;
       text-align: center;
-      font-size: 28px;
-      margin-bottom: 30px;
     }
 
-    #searchInput, #searchInput2, #searchInput3, #searchInput4 {
-      display: block;
-      margin: 0 auto;
-      width: 60%;
-      padding: 12px 20px;
-      font-size: 18px;
-      border: 2px solid #8e44ad;
-      border-radius: 30px;
-      outline: none;
-      transition: 0.3s;
-    }
-
-    #searchInput:focus, #searchInput2:focus, #searchInput3:focus, #searchInput4:focus {
-      box-shadow: 0 0 8px #9b59b6;
-    }
-    table {
-      margin: 30px auto 0;
-      width: 90%;
-      border-collapse: separate;
-      border-spacing: 0;
-      border-radius: 10px;
-      overflow: hidden;
-      background-color: #ffffff;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      animation: fadeIn 0.5s ease-in-out;
-    }
-
-    th {
-      background-color: #8e44ad;
-      color: #fff;
-      padding: 12px;
+    input[type="text"] {
+      font-family: inherit;
       font-size: 16px;
-    }
-
-    td {
-      padding: 12px;
-      border-bottom: 1px solid #f0f0f0;
-    }
-
-    tr:hover {
-      background-color: #f9f0ff;
-    }
-
-    /* 新增選擇器樣式 */
-    .field-selector {
-      margin-right: 8px;
-      padding: 4px 8px;
-      border: 1px solid #8e44ad;
+      padding: 10px 14px;
+      border: 1.5px solid #90caf9;
       border-radius: 4px;
-      background-color: white;
-      color: #8e44ad;
-      font-size: 12px;
-      cursor: pointer;
-      transition: all 0.3s;
+      margin: 8px 6px 8px 0;
+      background: #fff;
+      transition: border 0.2s, box-shadow 0.2s;
+      box-shadow: 0 1px 2px rgba(25, 118, 210, 0.06);
+      outline: none;
+      width: 405px; /* 原本約240px，這裡加長20px */
     }
-
-    .field-selector.select {
-      background-color: #27ae60;
-      color: white;
-      border-color: #27ae60;
-    }
-
-    .field-selector.where {
-      background-color: #e74c3c;
-      color: white;
-      border-color: #e74c3c;
-    }
-
-    .field-selector.both {
-      background-color: #f39c12;
-      color: white;
-      border-color: #f39c12;
-    }
-
-    .field-selector.joinkey {
-      background-color: #2980b9;
-      color: white;
-      border-color: #2980b9;
-    }
-
-    .field-row {
-      cursor: pointer;
-    }
-
-    .field-row.selected-select {
-      background-color: #e8f5e8 !important;
-    }
-
-    .field-row.selected-where {
-      background-color: #ffeaea !important;
-    }
-
-    .field-row.selected-both {
-      background-color: #fff8e1 !important;
-    }
-
-    .field-row.selected-joinkey {
-      background-color: #e3f2fd !important;
-    }
-
-    .field-selector.joinkeysel {
-      background-color: #16a085;
-      color: white;
-      border-color: #16a085;
-    }
-
-    .field-row.selected-joinkeysel {
-      background-color: #e0f7fa !important;
+    input[type="text"]:focus {
+      border: 2px solid #1976d2;
+      box-shadow: 0 2px 8px rgba(25, 118, 210, 0.12);
     }
 
     .controls {
+      margin: 16px 0 20px 0;
       text-align: center;
-      margin: 20px;
+    }
+
+    /* 讓輸入框區塊置中 */
+    .input-group,
+    #searchInput,
+    #searchInput2,
+    #searchInput3,
+    #searchInput4 {
+      display: inline-block;
+      text-align: left;
+    }
+
+    body > input[type="text"] {
+      display: inline-block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    body {
+      text-align: center;
     }
 
     .btn {
-      background: linear-gradient(45deg, #8e44ad, #9b59b6);
-      color: white;
+      background: #1976d2;
+      color: #fff;
       border: none;
-      padding: 10px 20px;
-      border-radius: 25px;
-      font-size: 14px;
+      border-radius: 4px;
+      font-size: 15px;
+      padding: 8px 18px;
+      margin: 0 6px 8px 0;
       cursor: pointer;
-      margin: 0 10px;
-      transition: all 0.3s;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      font-weight: 500;
+      box-shadow: 0 2px 4px rgba(25, 118, 210, 0.10);
+      transition: background 0.2s, box-shadow 0.2s;
+      letter-spacing: 0.5px;
+    }
+    .btn:hover, .btn:focus {
+      background: #1565c0;
+      box-shadow: 0 4px 12px rgba(25, 118, 210, 0.18);
     }
 
-    .btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    #resultTable {
+      width: 98%;
+      margin: 0 auto 24px auto;
+      border-collapse: separate;
+      border-spacing: 0;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(60,64,67,0.10);
+      overflow: hidden;
     }
 
-    .btn:active {
-      transform: translateY(0);
+    #resultTable th, #resultTable td {
+      padding: 10px 8px;
+      text-align: left;
+    }
+
+    #resultTable thead th {
+      background: #e3f2fd;
+      color: #1976d2;
+      font-weight: 500;
+      border-bottom: 2px solid #90caf9;
+    }
+
+    #resultTable tbody tr {
+      border-bottom: 1px solid #e0e0e0;
+      transition: background 0.18s;
+    }
+    #resultTable tbody tr:hover {
+      background: #e3f2fd;
+    }
+
+    .field-selector {
+      background: #f5f5f5;
+      color: #1976d2;
+      border: 1.5px solid #90caf9;
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, border 0.2s;
+      margin: 0 2px;
+      outline: none;
+    }
+    .field-selector.select {
+      background: #e3f2fd;
+      color: #1976d2;
+      border-color: #1976d2;
+    }
+    .field-selector.where {
+      background: #ffebee;
+      color: #d32f2f;
+      border-color: #d32f2f;
+    }
+    .field-selector.both {
+      background: linear-gradient(90deg, #e3f2fd 0%, #ffebee 100%);
+      color: #1976d2;
+      border-color: #1976d2;
+    }
+    .field-selector.joinkey {
+      background: #fffde7;
+      color: #f9a825;
+      border-color: #fbc02d;
+    }
+    .field-selector.joinkeysel {
+      background: linear-gradient(90deg, #fffde7 0%, #e3f2fd 100%);
+      color: #1976d2;
+      border-color: #fbc02d;
+    }
+    .field-selector.joinkeyselwhere {
+      background: linear-gradient(90deg, #fffde7 0%, #e3f2fd 50%, #ffebee 100%);
+      color: #1976d2;
+      border-color: #fbc02d;
+    }
+    .field-selector:focus {
+      box-shadow: 0 0 0 2px #1976d2;
+    }
+
+    .field-row.selected-select    { background: #e3f2fd !important; }
+    .field-row.selected-where    { background: #ffebee !important; }
+    .field-row.selected-both     { background: linear-gradient(90deg, #e3f2fd 0%, #ffebee 100%) !important; }
+    .field-row.selected-joinkey  { background: #fffde7 !important; }
+    .field-row.selected-joinkeysel { background: linear-gradient(90deg, #fffde7 0%, #e3f2fd 100%) !important; }
+    .field-row.selected-joinkeyselwhere { background: linear-gradient(90deg, #fffde7 0%, #e3f2fd 50%, #ffebee 100%) !important; }
+
+    .btn-move-up, .btn-move-down {
+      background: #fff;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      margin: 0 2px;
+      font-size: 18px;
+      padding: 6px 10px;
+      box-shadow: 0 2px 4px rgba(60,64,67,0.15);
+      color: #1976d2;
+      transition: background 0.2s, box-shadow 0.2s, color 0.2s;
+      outline: none;
+      vertical-align: middle;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-move-up:hover, .btn-move-down:hover {
+      background: #e3f2fd;
+      color: #0d47a1;
+      box-shadow: 0 4px 12px rgba(25,118,210,0.18);
+    }
+    .btn-move-up:active, .btn-move-down:active {
+      background: #bbdefb;
+      color: #1565c0;
+      box-shadow: 0 2px 6px rgba(25,118,210,0.22);
+    }
+    .btn-move-up:focus, .btn-move-down:focus {
+      outline: 2px solid #1976d2;
+      outline-offset: 2px;
     }
 
     .sql-section {
-      width: 90%;
-      margin: 20px auto;
-      background-color: #fef6ff;
-      border: 2px dashed #bb6bd9;
-      border-radius: 10px;
-      padding: 15px;
-      font-size: 16px;
-      color: #6c3483;
-      animation: fadeIn 0.4s ease-in-out;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(60,64,67,0.10);
+      margin: 24px auto 0 auto;
+      padding: 24px 18px 18px 18px;
+      width: 96%;
+      max-width: 1100px;
     }
 
     .sql-tabs {
-      margin-bottom: 15px;
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
     }
 
     .tab-btn {
-      background: #bb6bd9;
-      color: white;
+      background: #e3f2fd;
+      color: #1976d2;
       border: none;
-      padding: 8px 16px;
-      margin-right: 5px;
-      border-radius: 5px 5px 0 0;
+      border-radius: 4px 4px 0 0;
+      padding: 8px 22px;
+      font-size: 15px;
+      font-weight: 500;
       cursor: pointer;
-      font-size: 14px;
+      transition: background 0.2s, color 0.2s;
+      margin-right: 2px;
     }
-
-    .tab-btn.active {
-      background: #8e44ad;
+    .tab-btn.active, .tab-btn:focus {
+      background: #1976d2;
+      color: #fff;
+      outline: none;
     }
 
     .tab-content {
       display: none;
+      background: #fff;
+      border-radius: 0 0 8px 8px;
+      padding: 18px 10px 10px 10px;
+      box-shadow: 0 1px 4px rgba(60,64,67,0.08);
     }
-
     .tab-content.active {
       display: block;
     }
 
     pre {
-      background-color: #fdfbff;
+      background-color: #f5f5f5;
       padding: 15px;
       border-radius: 8px;
-      font-family: Consolas, monospace;
+      font-family: 'Roboto Mono', 'Consolas', monospace;
       overflow-x: auto;
       white-space: pre-wrap;
       border: 1px solid #e0e0e0;
       margin: 10px 0;
+      font-size: 15px;
+      color: #263238;
     }
 
     .copy-btn {
       float: right;
-      background: #27ae60;
+      background: #1976d2;
       color: white;
       border: none;
-      padding: 5px 10px;
-      border-radius: 3px;
+      padding: 6px 14px;
+      border-radius: 4px;
       cursor: pointer;
-      font-size: 12px;
+      font-size: 13px;
       margin-bottom: 10px;
+      margin-left: 8px;
+      font-weight: 500;
+      box-shadow: 0 2px 4px rgba(25, 118, 210, 0.10);
+      transition: background 0.2s, box-shadow 0.2s;
     }
-
     .copy-btn:hover {
-      background: #2ecc71;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+      background: #1565c0;
+      box-shadow: 0 4px 12px rgba(25, 118, 210, 0.18);
     }
 
     .selection-info {
-      background: #e8f5e8;
-      border: 1px solid #27ae60;
+      background: #e3f2fd;
+      border: 1px solid #90caf9;
       border-radius: 5px;
       padding: 10px;
       margin: 15px 0;
-      color: #2c3e50;
+      color: #1976d2;
+      font-size: 15px;
     }
 
     .selection-info .select-fields {
-      color: #27ae60;
+      color: #388e3c;
       font-weight: bold;
     }
-
     .selection-info .where-fields {
-      color: #e74c3c;
+      color: #d32f2f;
       font-weight: bold;
     }
 
@@ -244,57 +296,37 @@ body {
       border-radius: 8px;
       margin: 15px 0;
       padding: 15px;
-      background-color: #f9f9f9;
+      background-color: #fafafa;
+      box-shadow: 0 1px 4px rgba(60,64,67,0.08);
     }
 
     .table-title {
       font-weight: bold;
-      color: #8e44ad;
+      color: #1976d2;
       margin-bottom: 10px;
-      border-bottom: 2px solid #8e44ad;
+      border-bottom: 2px solid #90caf9;
       padding-bottom: 5px;
+      font-size: 16px;
     }
 
     .warning {
-      background-color: #fff3cd;
-      border: 1px solid #ffeaa7;
-      color: #d68910;
+      background-color: #fffde7;
+      border: 1px solid #ffe082;
+      color: #f9a825;
       padding: 10px;
       border-radius: 5px;
       margin: 10px 0;
+      font-size: 15px;
     }
 
-    .field-selector.joinkeyselwhere {
-      background: linear-gradient(90deg, #f7971e 0%, #ffd200 100%);
-      color: #333;
-      border: 1.5px solid #e67e22;
-      font-weight: bold;
+    .input-row {
+      text-align: center;
+      margin-bottom: 0;
     }
-
-    /* 新增：joinkeyselwhere 對應的 row 高亮顏色 */
-    .field-row.selected-joinkeyselwhere {
-      background-color: #fffbe6 !important;
-    }
-
-    .btn-move-up, .btn-move-down {
-      background: linear-gradient(90deg, #f5f6fa 0%, #d6eaf8 100%);
-      border: 1px solid #8ecae6;
-      border-radius: 50%;
-      cursor: pointer;
-      margin: 0 2px;
-      font-size: 16px;
-      padding: 4px 8px;
-      transition: background 0.2s, box-shadow 0.2s;
-      box-shadow: 0 1px 3px rgba(142,202,230,0.15);
+    .input-row input[type="text"] {
+      display: inline-block;
+      margin: 8px 10px 8px 0;
       vertical-align: middle;
     }
-    .btn-move-up:hover, .btn-move-down:hover {
-      background: linear-gradient(90deg, #caf0f8 0%, #90e0ef 100%);
-      border-color: #2196f3;
-      box-shadow: 0 2px 6px rgba(33,150,243,0.18);
-    }
-    .btn-move-up:active, .btn-move-down:active {
-      background: #48cae4;
-      color: #fff;
-      border-color: #2196f3;
-    }
+
+    /* ...可依需求補充其他 Material Design 風格... */

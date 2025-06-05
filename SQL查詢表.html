@@ -9,10 +9,15 @@
 
   <h2>📊 B2B資料表欄位中英對照查詢系統</h2>
 
-  <input type="text" id="searchInput" placeholder="🔍 請輸入資料表名稱關鍵字（英文）">
-  <input type="text" id="searchInput2" placeholder="🔍 請輸入欄位名稱關鍵字（英文）">
-  <input type="text" id="searchInput4" placeholder="🔍 請輸入資料表中文說明關鍵字（中文）">
-  <input type="text" id="searchInput3" placeholder="🔍 請輸入欄位中文說明關鍵字（中文）">
+  <!-- 輸入框區塊改為兩行，每行兩個輸入框 -->
+  <div class="input-row">
+    <input type="text" id="searchInput" placeholder="🔍 請輸入資料表名稱（英文）">
+    <input type="text" id="searchInput4" placeholder="🔍 請輸入資料表中文說明（中文）">
+  </div>
+  <div class="input-row">
+    <input type="text" id="searchInput2" placeholder="🔍 請輸入欄位名稱（英文）">
+    <input type="text" id="searchInput3" placeholder="🔍 請輸入欄位中文說明（中文）">
+  </div>
   <div class="controls">
     <button class="btn" onclick="selectAllForSelect()">🔍 全選為 SELECT</button>
     <button class="btn" onclick="selectAllForWhere()">🎯 全選為 WHERE</button>
@@ -164,9 +169,13 @@
           moveTd.style.minWidth = "60px";
           moveTd.style.textAlign = "center";
           moveTd.innerHTML = `
-            <button class="btn-move-up" title="上移" data-tablekey="${tableKey}" onclick="moveJoinOrder(event, '${tableKey}', -1)">⬆️</button>
-            <button class="btn-move-down" title="下移" data-tablekey="${tableKey}" onclick="moveJoinOrder(event, '${tableKey}', 1)">⬇️</button>
-          `;
+  <button class="btn-move-up" title="上移" data-tablekey="${tableKey}" onclick="moveJoinOrder(event, '${tableKey}', -1)">
+    <span class="material-icons">up</span>
+  </button>
+  <button class="btn-move-down" title="下移" data-tablekey="${tableKey}" onclick="moveJoinOrder(event, '${tableKey}', 1)">
+    <span class="material-icons">down</span>
+  </button>
+`;
 
           tr.appendChild(selectorTd);
           tr.appendChild(moveTd);
