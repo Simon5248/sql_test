@@ -270,3 +270,8 @@ body {
       border: 1.5px solid #e67e22;
       font-weight: bold;
     }
+
+    /* 新增：joinkeyselwhere 對應的 row 高亮顏色 */
+    .field-row.selected-joinkeyselwhere {
+      background-color: #fffbe6 !important;
+    }
