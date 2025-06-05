@@ -215,7 +215,7 @@
       const row = selector.closest("tr");
       const fieldKey = `${schemaName}.${tableName}.${fieldName}`;
 
-      // 狀態循環：none → select → where → both → joinKey → joinKeySel → none
+      // 狀態循環：none → select → where → both → joinkey → joinkeysel → joinkeyselwhere → none
       switch (selector.dataset.state) {
         case "none":
           selector.dataset.state = "select";
@@ -227,7 +227,7 @@
             description: getFieldDescription(fieldName, tableName, schemaName)
           });
           row.classList.add("selected-select");
-          row.classList.remove("selected-where", "selected-both", "selected-joinkey", "selected-joinkeysel");
+          row.classList.remove("selected-where", "selected-both", "selected-joinkey", "selected-joinkeysel", "selected-joinkeyselwhere");
           break;
         case "select":
           selector.dataset.state = "where";
@@ -239,7 +239,7 @@
             description: getFieldDescription(fieldName, tableName, schemaName)
           });
           row.classList.add("selected-where");
-          row.classList.remove("selected-select", "selected-both", "selected-joinkey", "selected-joinkeysel");
+          row.classList.remove("selected-select", "selected-both", "selected-joinkey", "selected-joinkeysel", "selected-joinkeyselwhere");
           break;
         case "where":
           selector.dataset.state = "both";
@@ -251,7 +251,7 @@
             description: getFieldDescription(fieldName, tableName, schemaName)
           });
           row.classList.add("selected-both");
-          row.classList.remove("selected-select", "selected-where", "selected-joinkey", "selected-joinkeysel");
+          row.classList.remove("selected-select", "selected-where", "selected-joinkey", "selected-joinkeysel", "selected-joinkeyselwhere");
           break;
         case "both":
           selector.dataset.state = "joinkey";
@@ -263,7 +263,7 @@
             description: getFieldDescription(fieldName, tableName, schemaName)
           });
           row.classList.add("selected-joinkey");
-          row.classList.remove("selected-select", "selected-where", "selected-both", "selected-joinkeysel");
+          row.classList.remove("selected-select", "selected-where", "selected-both", "selected-joinkeysel", "selected-joinkeyselwhere");
           break;
         case "joinkey":
           selector.dataset.state = "joinkeysel";
@@ -275,14 +275,26 @@
             description: getFieldDescription(fieldName, tableName, schemaName)
           });
           row.classList.add("selected-joinkeysel");
-          row.classList.remove("selected-select", "selected-where", "selected-both", "selected-joinkey");
+          row.classList.remove("selected-select", "selected-where", "selected-both", "selected-joinkey", "selected-joinkeyselwhere");
           break;
         case "joinkeysel":
+          selector.dataset.state = "joinkeyselwhere";
+          selector.textContent = "JOIN KEY+SELECT+WHERE";
+          selector.className = "field-selector joinkeyselwhere";
+          selectedFields.set(fieldKey, {
+            type: "joinkeyselwhere",
+            fieldName, tableName, schemaName,
+            description: getFieldDescription(fieldName, tableName, schemaName)
+          });
+          row.classList.add("selected-joinkeyselwhere");
+          row.classList.remove("selected-select", "selected-where", "selected-both", "selected-joinkey", "selected-joinkeysel");
+          break;
+        case "joinkeyselwhere":
           selector.dataset.state = "none";
           selector.textContent = "未選擇";
           selector.className = "field-selector";
           selectedFields.delete(fieldKey);
-          row.classList.remove("selected-select", "selected-where", "selected-both", "selected-joinkey", "selected-joinkeysel");
+          row.classList.remove("selected-select", "selected-where", "selected-both", "selected-joinkey", "selected-joinkeysel", "selected-joinkeyselwhere");
           break;
       }
     }
@@ -411,6 +423,11 @@
         } else if (fieldInfo.type === "joinkeysel") {
           tableGroups[tableKey].joinKeyFields.push(fieldInfo);
           tableGroups[tableKey].selectFields.push(fieldInfo);
+          tableGroups[tableKey].joinKeySelectFields.push(fieldInfo);
+        } else if (fieldInfo.type === "joinkeyselwhere") {
+          tableGroups[tableKey].joinKeyFields.push(fieldInfo);
+          tableGroups[tableKey].selectFields.push(fieldInfo);
+          tableGroups[tableKey].whereFields.push(fieldInfo);
           tableGroups[tableKey].joinKeySelectFields.push(fieldInfo);
         }
       });
