@@ -25,6 +25,7 @@
     <thead>
       <tr>
         <th>欄位組合選項</th>
+        <th>順序</th>
         <th>Schema 名稱</th>
         <th>資料表名稱</th>
         <th>資料表說明</th>
@@ -124,43 +125,75 @@
     const queryDiv = document.getElementById("queryResult");
     let currentMatched = [];
     let selectedFields = new Map(); // 改用 Map 來儲存欄位資訊，key: fieldName, value: {type, tableInfo}
+    // 新增：join 順序調整功能
+    let joinOrder = []; // 儲存 join 順序（tableKey 陣列）
 
     function renderTable(filteredData) {
       tbody.innerHTML = "";
       queryDiv.style.display = "none";
       selectedFields.clear();
-
       currentMatched = filteredData;
 
+      // 重新產生 joinOrder
+      joinOrder = [];
+
       if (currentMatched.length > 0) {
-      currentMatched.forEach((row, index) => {
-        const tr = document.createElement("tr");
-        tr.className = "field-row";
-        tr.dataset.index = index;
+        currentMatched.forEach((row, index) => {
+          const tr = document.createElement("tr");
+          tr.className = "field-row";
+          tr.dataset.index = index;
 
-        // 加入選擇器
-        const selectorTd = document.createElement("td");
-        const selector = document.createElement("button");
-        selector.className = "field-selector";
-        selector.textContent = "未選擇";
-        selector.dataset.field = row["欄位名稱"];
-        selector.dataset.table = row["資料表名稱"];
-        selector.dataset.schema = row["Schema 名稱"];
-        selector.dataset.state = "none"; // none, select, where, both
-        selector.addEventListener("click", handleFieldSelection);
-        selectorTd.appendChild(selector);
-        tr.appendChild(selectorTd);
+          // 加入選擇器
+          const selectorTd = document.createElement("td");
+          const selector = document.createElement("button");
+          selector.className = "field-selector";
+          selector.textContent = "未選擇";
+          selector.dataset.field = row["欄位名稱"];
+          selector.dataset.table = row["資料表名稱"];
+          selector.dataset.schema = row["Schema 名稱"];
+          selector.dataset.state = "none";
+          selector.addEventListener("click", handleFieldSelection);
+          selectorTd.appendChild(selector);
 
-        // 加入其他欄位
-        for (const key in row) {
-        const td = document.createElement("td");
-        td.textContent = row[key];
-        tr.appendChild(td);
-        }
+          // 新增：如果有 join key 欄位，顯示上下移動按鈕
+          const tableKey = `${row["Schema 名稱"]}.${row["資料表名稱"]}`;
+          if (!joinOrder.includes(tableKey)) {
+            joinOrder.push(tableKey);
+          }
+          const moveTd = document.createElement("td");
+          moveTd.style.minWidth = "60px";
+          moveTd.style.textAlign = "center";
+          moveTd.innerHTML = `
+            <button class="btn-move-up" title="上移" data-tablekey="${tableKey}" onclick="moveJoinOrder(event, '${tableKey}', -1)">⬆️</button>
+            <button class="btn-move-down" title="下移" data-tablekey="${tableKey}" onclick="moveJoinOrder(event, '${tableKey}', 1)">⬇️</button>
+          `;
 
-        tbody.appendChild(tr);
-      });
+          tr.appendChild(selectorTd);
+          tr.appendChild(moveTd);
+
+          // 加入其他欄位
+          for (const key in row) {
+            const td = document.createElement("td");
+            td.textContent = row[key];
+            tr.appendChild(td);
+          }
+
+          tbody.appendChild(tr);
+        });
       }
+    }
+
+    // 新增：調整 join 順序的函式
+    function moveJoinOrder(event, tableKey, direction) {
+      event.stopPropagation();
+      const idx = joinOrder.indexOf(tableKey);
+      if (idx === -1) return;
+      const newIdx = idx + direction;
+      if (newIdx < 0 || newIdx >= joinOrder.length) return;
+      // 交換順序
+      [joinOrder[idx], joinOrder[newIdx]] = [joinOrder[newIdx], joinOrder[idx]];
+      // 重新產生 SQL
+      generateSQL();
     }
 
     function filterData() {
@@ -602,7 +635,15 @@
     }
 
     function generateJoinSQL(tableGroups) {
-      const tables = Object.values(tableGroups);
+      // 依 joinOrder 排序
+      const tables = joinOrder
+        .map(key => tableGroups[key])
+        .filter(Boolean)
+        .concat(
+          Object.values(tableGroups).filter(
+            g => !joinOrder.includes(`${g.schemaName}.${g.tableName}`)
+          )
+        );
       if (tables.length < 2) {
         document.getElementById("selectSql").innerHTML = "<pre>-- 請選擇兩個以上資料表並指定 JOIN KEY</pre>";
         document.getElementById("insertSql").innerHTML = "";

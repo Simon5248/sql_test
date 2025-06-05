@@ -275,3 +275,26 @@ body {
     .field-row.selected-joinkeyselwhere {
       background-color: #fffbe6 !important;
     }
+
+    .btn-move-up, .btn-move-down {
+      background: linear-gradient(90deg, #f5f6fa 0%, #d6eaf8 100%);
+      border: 1px solid #8ecae6;
+      border-radius: 50%;
+      cursor: pointer;
+      margin: 0 2px;
+      font-size: 16px;
+      padding: 4px 8px;
+      transition: background 0.2s, box-shadow 0.2s;
+      box-shadow: 0 1px 3px rgba(142,202,230,0.15);
+      vertical-align: middle;
+    }
+    .btn-move-up:hover, .btn-move-down:hover {
+      background: linear-gradient(90deg, #caf0f8 0%, #90e0ef 100%);
+      border-color: #2196f3;
+      box-shadow: 0 2px 6px rgba(33,150,243,0.18);
+    }
+    .btn-move-up:active, .btn-move-down:active {
+      background: #48cae4;
+      color: #fff;
+      border-color: #2196f3;
+    }
