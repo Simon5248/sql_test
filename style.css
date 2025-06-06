@@ -1,39 +1,43 @@
+/* ====== 全域設定 ====== */
 body {
-      font-family: 'Roboto', 'Noto Sans TC', Arial, sans-serif;
-      background: #f5f5f5;
-      color: #222;
-      margin: 0;
-      padding: 0;
-    }
+  font-family: 'Roboto', 'Noto Sans TC', Arial, sans-serif;
+  background: #f5f5f5;
+  color: #222;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
 
-    h2 {
-      color: #1976d2;
-      font-weight: 500;
-      letter-spacing: 1px;
-      margin-top: 32px;
-      margin-bottom: 24px;
-      text-align: center;
-    }
+/* ====== 標題 ====== */
+h2 {
+  color: #1976d2;
+  font-weight: 500;
+  letter-spacing: 1px;
+  margin-top: 32px;
+  margin-bottom: 24px;
+  text-align: center;
+}
 
-    input[type="text"] {
-      font-family: inherit;
-      font-size: 16px;
-      padding: 10px 14px;
-      border: 1.5px solid #90caf9;
-      border-radius: 4px;
-      margin: 8px 6px 8px 0;
-      background: #fff;
-      transition: border 0.2s, box-shadow 0.2s;
-      box-shadow: 0 1px 2px rgba(25, 118, 210, 0.06);
-      outline: none;
-      width: 405px; /* 原本約240px，這裡加長20px */
-    }
-    input[type="text"]:focus {
-      border: 2px solid #1976d2;
-      box-shadow: 0 2px 8px rgba(25, 118, 210, 0.12);
-    }
+/* ====== 輸入框 ====== */
+input[type="text"] {
+  font-family: inherit;
+  font-size: 16px;
+  padding: 10px 14px;
+  border: 1.5px solid #90caf9;
+  border-radius: 4px;
+  margin: 8px 6px 8px 0;
+  background: #fff;
+  transition: border 0.2s, box-shadow 0.2s;
+  box-shadow: 0 1px 2px rgba(25, 118, 210, 0.06);
+  outline: none;
+  width: 405px; /* 輸入框寬度 */
+}
+input[type="text"]:focus {
+  border: 2px solid #1976d2;
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.12);
+}
 
-    /* 日期區間輸入框美化 */
+/* ====== 日期輸入框 ====== */
 .input-row input[type="date"] {
   padding: 8px 14px;
   border: 2px solid #1976d2;
@@ -49,7 +53,7 @@ body {
   outline: none;
 }
 
-/* Checkbox 美化 */
+/* ====== Checkbox 美化 ====== */
 .input-row label {
   display: inline-flex;
   align-items: center;
@@ -66,333 +70,356 @@ body {
   cursor: pointer;
 }
 
-/* 讓整個 input-row 更整齊 */
+/* ====== 輸入區塊排列 ====== */
 .input-row {
   margin-bottom: 10px;
   display: flex;
   align-items: center;
-  justify-content: center; /* 讓內容置中 */
-  text-align: initial;     /* 移除 text-align: left 或 center，避免影響 flex */
+  justify-content: center;
+  text-align: initial;
+}
+.input-row input[type="text"] {
+  display: inline-block;
+  margin: 8px 10px 8px 0;
+  vertical-align: middle;
 }
 
-    .controls {
-      margin: 16px 0 20px 0;
-      text-align: center;
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
+/* ====== 控制按鈕區塊 ====== */
+.controls {
+  margin: 16px 0 20px 0;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
 
-    /* 讓輸入框區塊置中 */
-    .input-group,
-    #searchInput,
-    #searchInput2,
-    #searchInput3,
-    #searchInput4 {
-      display: inline-block;
-      text-align: left;
-    }
+/* ====== 輸入框置中 ====== */
+.input-group,
+#searchInput,
+#searchInput2,
+#searchInput3,
+#searchInput4 {
+  display: inline-block;
+  text-align: left;
+}
+body > input[type="text"] {
+  display: inline-block;
+  margin-left: auto;
+  margin-right: auto;
+}
 
-    body > input[type="text"] {
-      display: inline-block;
-      margin-left: auto;
-      margin-right: auto;
-    }
+/* ====== 按鈕樣式 ====== */
+.btn {
+  background: #1976d2;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 15px;
+  padding: 8px 18px;
+  margin: 0 6px 8px 0;
+  cursor: pointer;
+  font-weight: 500;
+  box-shadow: 0 2px 4px rgba(25, 118, 210, 0.10);
+  transition: background 0.2s, box-shadow 0.2s;
+  letter-spacing: 0.5px;
+  display: inline-block;
+}
+.btn:hover, .btn:focus {
+  background: #1565c0;
+  box-shadow: 0 4px 12px rgba(25, 118, 210, 0.18);
+}
 
-    body {
-      text-align: center;
-    }
+/* ====== 查詢結果表格 ====== */
+#resultTable {
+  width: 98%;
+  margin: 0 auto 24px auto;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(60,64,67,0.10);
+  overflow: hidden;
+}
+#resultTable th,
+#resultTable td {
+  text-align: left;
+}
+#resultTable td {
+  text-align: left;
+  vertical-align: middle;
+}
+#resultTable thead th {
+  background: #e3f2fd;
+  color: #1976d2;
+  font-weight: 500;
+  border-bottom: 2px solid #90caf9;
+}
+#resultTable tbody tr {
+  border-bottom: 1px solid #e0e0e0;
+  transition: background 0.18s;
+}
+#resultTable tbody tr:hover {
+  background: #e3f2fd;
+}
+#resultTable td:nth-child(7) {
+  max-width: 500px;
+  white-space: pre-line;
+  word-break: break-all;
+  overflow-wrap: break-word;
+}
 
-    .btn {
-      background: #1976d2;
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      font-size: 15px;
-      padding: 8px 18px;
-      margin: 0 6px 8px 0;
-      cursor: pointer;
-      font-weight: 500;
-      box-shadow: 0 2px 4px rgba(25, 118, 210, 0.10);
-      transition: background 0.2s, box-shadow 0.2s;
-      letter-spacing: 0.5px;
-      display: inline-block;
-    }
-    .btn:hover, .btn:focus {
-      background: #1565c0;
-      box-shadow: 0 4px 12px rgba(25, 118, 210, 0.18);
-    }
+/* ====== 欄位選擇器樣式 ====== */
+.field-selector {
+  background: #f5f5f5;
+  color: #1976d2;
+  border: 1.5px solid #90caf9;
+  border-radius: 20px;
+  padding: 4px 14px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border 0.2s;
+  margin: 0 2px;
+  outline: none;
+}
+.field-selector.select {
+  background: #e3f2fd;
+  color: #1976d2;
+  border-color: #1976d2;
+}
+.field-selector.where {
+  background: #ffebee;
+  color: #d32f2f;
+  border-color: #d32f2f;
+}
+.field-selector.both {
+  background: linear-gradient(90deg, #e3f2fd 0%, #ffebee 100%);
+  color: #1976d2;
+  border-color: #1976d2;
+}
+.field-selector.joinkey {
+  background: #fffde7;
+  color: #f9a825;
+  border-color: #fbc02d;
+}
+.field-selector.joinkeysel {
+  background: linear-gradient(90deg, #fffde7 0%, #e3f2fd 100%);
+  color: #1976d2;
+  border-color: #fbc02d;
+}
+.field-selector.joinkeyselwhere {
+  background: linear-gradient(90deg, #fffde7 0%, #e3f2fd 50%, #ffebee 100%);
+  color: #1976d2;
+  border-color: #fbc02d;
+}
+.field-selector:focus {
+  box-shadow: 0 0 0 2px #1976d2;
+}
 
-    #resultTable {
-      width: 98%;
-      margin: 0 auto 24px auto;
-      border-collapse: separate;
-      border-spacing: 0;
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(60,64,67,0.10);
-      overflow: hidden;
-    }
+/* ====== 欄位列選擇狀態 ====== */
+.field-row.selected-select    { background: #e3f2fd !important; }
+.field-row.selected-where    { background: #ffebee !important; }
+.field-row.selected-both     { background: linear-gradient(90deg, #e3f2fd 0%, #ffebee 100%) !important; }
+.field-row.selected-joinkey  { background: #fffde7 !important; }
+.field-row.selected-joinkeysel { background: linear-gradient(90deg, #fffde7 0%, #e3f2fd 100%) !important; }
+.field-row.selected-joinkeyselwhere { background: linear-gradient(90deg, #fffde7 0%, #e3f2fd 50%, #ffebee 100%) !important; }
 
-    #resultTable th,
-    #resultTable td {
-      text-align: left;
-    }
+/* ====== 上下移動按鈕 ====== */
+.btn-move-up, .btn-move-down {
+  background: #fff;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  margin: 0 2px;
+  font-size: 18px;
+  padding: 6px 10px;
+  box-shadow: 0 2px 4px rgba(60,64,67,0.15);
+  color: #1976d2;
+  transition: background 0.2s, box-shadow 0.2s, color 0.2s;
+  outline: none;
+  vertical-align: middle;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.btn-move-up:hover, .btn-move-down:hover {
+  background: #e3f2fd;
+  color: #0d47a1;
+  box-shadow: 0 4px 12px rgba(25,118,210,0.18);
+}
+.btn-move-up:active, .btn-move-down:active {
+  background: #bbdefb;
+  color: #1565c0;
+  box-shadow: 0 2px 6px rgba(25,118,210,0.22);
+}
+.btn-move-up:focus, .btn-move-down:focus {
+  outline: 2px solid #1976d2;
+  outline-offset: 2px;
+}
 
-    #resultTable td {
-      text-align: left;
-      vertical-align: middle;
-    }
+/* ====== SQL 區塊 ====== */
+.sql-section {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(60,64,67,0.10);
+  margin: 24px auto 0 auto;
+  padding: 24px 18px 18px 18px;
+  width: 96%;
+  max-width: 1100px;
+}
 
-    #resultTable thead th {
-      background: #e3f2fd;
-      color: #1976d2;
-      font-weight: 500;
-      border-bottom: 2px solid #90caf9;
-    }
+/* ====== SQL 標籤頁 ====== */
+.sql-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.tab-btn {
+  background: #e3f2fd;
+  color: #1976d2;
+  border: none;
+  border-radius: 4px 4px 0 0;
+  padding: 8px 22px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  margin-right: 2px;
+}
+.tab-btn.active, .tab-btn:focus {
+  background: #1976d2;
+  color: #fff;
+  outline: none;
+}
+.tab-content {
+  display: none;
+  background: #fff;
+  border-radius: 0 0 8px 8px;
+  padding: 18px 10px 10px 10px;
+  box-shadow: 0 1px 4px rgba(60,64,67,0.08);
+}
+.tab-content.active {
+  display: block;
+}
 
-    #resultTable tbody tr {
-      border-bottom: 1px solid #e0e0e0;
-      transition: background 0.18s;
-    }
-    #resultTable tbody tr:hover {
-      background: #e3f2fd;
-    }
+/* ====== SQL 語法區塊 ====== */
+pre {
+  background-color: #f5f5f5;
+  padding: 15px;
+  border-radius: 8px;
+  font-family: 'Roboto Mono', 'Consolas', monospace;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  border: 1px solid #e0e0e0;
+  margin: 10px 0;
+  font-size: 15px;
+  color: #263238;
+}
 
-    #resultTable td:nth-child(7) {
-      max-width: 500px;
-      white-space: pre-line;
-      word-break: break-all;
-      overflow-wrap: break-word;
-    }
+/* ====== 複製按鈕 ====== */
+.copy-btn {
+  float: right;
+  background: #1976d2;
+  color: white;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  margin-bottom: 10px;
+  margin-left: 8px;
+  font-weight: 500;
+  box-shadow: 0 2px 4px rgba(25, 118, 210, 0.10);
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.copy-btn:hover {
+  background: #1565c0;
+  box-shadow: 0 4px 12px rgba(25, 118, 210, 0.18);
+}
 
-    .field-selector {
-      background: #f5f5f5;
-      color: #1976d2;
-      border: 1.5px solid #90caf9;
-      border-radius: 20px;
-      padding: 4px 14px;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background 0.2s, color 0.2s, border 0.2s;
-      margin: 0 2px;
-      outline: none;
-    }
-    .field-selector.select {
-      background: #e3f2fd;
-      color: #1976d2;
-      border-color: #1976d2;
-    }
-    .field-selector.where {
-      background: #ffebee;
-      color: #d32f2f;
-      border-color: #d32f2f;
-    }
-    .field-selector.both {
-      background: linear-gradient(90deg, #e3f2fd 0%, #ffebee 100%);
-      color: #1976d2;
-      border-color: #1976d2;
-    }
-    .field-selector.joinkey {
-      background: #fffde7;
-      color: #f9a825;
-      border-color: #fbc02d;
-    }
-    .field-selector.joinkeysel {
-      background: linear-gradient(90deg, #fffde7 0%, #e3f2fd 100%);
-      color: #1976d2;
-      border-color: #fbc02d;
-    }
-    .field-selector.joinkeyselwhere {
-      background: linear-gradient(90deg, #fffde7 0%, #e3f2fd 50%, #ffebee 100%);
-      color: #1976d2;
-      border-color: #fbc02d;
-    }
-    .field-selector:focus {
-      box-shadow: 0 0 0 2px #1976d2;
-    }
+/* ====== 選擇資訊區塊 ====== */
+.selection-info {
+  background: #e3f2fd;
+  border: 1px solid #90caf9;
+  border-radius: 5px;
+  padding: 10px;
+  margin: 15px 0;
+  color: #1976d2;
+  font-size: 15px;
+}
+.selection-info .select-fields {
+  color: #388e3c;
+  font-weight: bold;
+}
+.selection-info .where-fields {
+  color: #d32f2f;
+  font-weight: bold;
+}
 
-    .field-row.selected-select    { background: #e3f2fd !important; }
-    .field-row.selected-where    { background: #ffebee !important; }
-    .field-row.selected-both     { background: linear-gradient(90deg, #e3f2fd 0%, #ffebee 100%) !important; }
-    .field-row.selected-joinkey  { background: #fffde7 !important; }
-    .field-row.selected-joinkeysel { background: linear-gradient(90deg, #fffde7 0%, #e3f2fd 100%) !important; }
-    .field-row.selected-joinkeyselwhere { background: linear-gradient(90deg, #fffde7 0%, #e3f2fd 50%, #ffebee 100%) !important; }
+/* ====== 表格區塊 ====== */
+.table-section {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin: 15px 0;
+  padding: 15px;
+  background-color: #fafafa;
+  box-shadow: 0 1px 4px rgba(60,64,67,0.08);
+}
+.table-title {
+  font-weight: bold;
+  color: #1976d2;
+  margin-bottom: 10px;
+  border-bottom: 2px solid #90caf9;
+  padding-bottom: 5px;
+  font-size: 16px;
+}
 
-    .btn-move-up, .btn-move-down {
-      background: #fff;
-      border: none;
-      border-radius: 50%;
-      cursor: pointer;
-      margin: 0 2px;
-      font-size: 18px;
-      padding: 6px 10px;
-      box-shadow: 0 2px 4px rgba(60,64,67,0.15);
-      color: #1976d2;
-      transition: background 0.2s, box-shadow 0.2s, color 0.2s;
-      outline: none;
-      vertical-align: middle;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .btn-move-up:hover, .btn-move-down:hover {
-      background: #e3f2fd;
-      color: #0d47a1;
-      box-shadow: 0 4px 12px rgba(25,118,210,0.18);
-    }
-    .btn-move-up:active, .btn-move-down:active {
-      background: #bbdefb;
-      color: #1565c0;
-      box-shadow: 0 2px 6px rgba(25,118,210,0.22);
-    }
-    .btn-move-up:focus, .btn-move-down:focus {
-      outline: 2px solid #1976d2;
-      outline-offset: 2px;
-    }
+/* ====== 警告訊息 ====== */
+.warning {
+  background-color: #fffde7;
+  border: 1px solid #ffe082;
+  color: #f9a825;
+  padding: 10px;
+  border-radius: 5px;
+  margin: 10px 0;
+  font-size: 15px;
+}
 
-    .sql-section {
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(60,64,67,0.10);
-      margin: 24px auto 0 auto;
-      padding: 24px 18px 18px 18px;
-      width: 96%;
-      max-width: 1100px;
-    }
+/* ====== 查詢 SQL 結果區塊對齊 ====== */
+#selectSql, #updateSql, #insertSql {
+  text-align: left;
+}
+#selectSql pre, #updateSql pre, #insertSql pre {
+  text-align: left;
+}
 
-    .sql-tabs {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
+/* ====== loading 轉圈圈 ====== */
+#loadingSpinner {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  left: 0; top: 0; right: 0; bottom: 0;
+  background: rgba(255,255,255,0.7);
+  justify-content: center;
+  align-items: center;
+}
+#loadingSpinner .spinner {
+  border: 8px solid #f3f3f3;
+  border-top: 8px solid #3498db;
+  border-radius: 50%;
+  width: 60px; height: 60px;
+  animation: spin 1s linear infinite;
+}
+#loadingSpinner .loading-text {
+  margin-top: 16px;
+  font-size: 1.2em;
+  color: #333;
+  text-align: center;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg);}
+  100% { transform: rotate(360deg);}
+}
 
-    .tab-btn {
-      background: #e3f2fd;
-      color: #1976d2;
-      border: none;
-      border-radius: 4px 4px 0 0;
-      padding: 8px 22px;
-      font-size: 15px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background 0.2s, color 0.2s;
-      margin-right: 2px;
-    }
-    .tab-btn.active, .tab-btn:focus {
-      background: #1976d2;
-      color: #fff;
-      outline: none;
-    }
-
-    .tab-content {
-      display: none;
-      background: #fff;
-      border-radius: 0 0 8px 8px;
-      padding: 18px 10px 10px 10px;
-      box-shadow: 0 1px 4px rgba(60,64,67,0.08);
-    }
-    .tab-content.active {
-      display: block;
-    }
-
-    pre {
-      background-color: #f5f5f5;
-      padding: 15px;
-      border-radius: 8px;
-      font-family: 'Roboto Mono', 'Consolas', monospace;
-      overflow-x: auto;
-      white-space: pre-wrap;
-      border: 1px solid #e0e0e0;
-      margin: 10px 0;
-      font-size: 15px;
-      color: #263238;
-    }
-
-    .copy-btn {
-      float: right;
-      background: #1976d2;
-      color: white;
-      border: none;
-      padding: 6px 14px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 13px;
-      margin-bottom: 10px;
-      margin-left: 8px;
-      font-weight: 500;
-      box-shadow: 0 2px 4px rgba(25, 118, 210, 0.10);
-      transition: background 0.2s, box-shadow 0.2s;
-    }
-    .copy-btn:hover {
-      background: #1565c0;
-      box-shadow: 0 4px 12px rgba(25, 118, 210, 0.18);
-    }
-
-    .selection-info {
-      background: #e3f2fd;
-      border: 1px solid #90caf9;
-      border-radius: 5px;
-      padding: 10px;
-      margin: 15px 0;
-      color: #1976d2;
-      font-size: 15px;
-    }
-
-    .selection-info .select-fields {
-      color: #388e3c;
-      font-weight: bold;
-    }
-    .selection-info .where-fields {
-      color: #d32f2f;
-      font-weight: bold;
-    }
-
-    .table-section {
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      margin: 15px 0;
-      padding: 15px;
-      background-color: #fafafa;
-      box-shadow: 0 1px 4px rgba(60,64,67,0.08);
-    }
-
-    .table-title {
-      font-weight: bold;
-      color: #1976d2;
-      margin-bottom: 10px;
-      border-bottom: 2px solid #90caf9;
-      padding-bottom: 5px;
-      font-size: 16px;
-    }
-
-    .warning {
-      background-color: #fffde7;
-      border: 1px solid #ffe082;
-      color: #f9a825;
-      padding: 10px;
-      border-radius: 5px;
-      margin: 10px 0;
-      font-size: 15px;
-    }
-
-    .input-row {
-      text-align: center;
-      margin-bottom: 0;
-    }
-    .input-row input[type="text"] {
-      display: inline-block;
-      margin: 8px 10px 8px 0;
-      vertical-align: middle;
-    }
-
-    #selectSql, #updateSql, #insertSql {
-      text-align: left;
-    }
-    #selectSql pre, #updateSql pre, #insertSql pre {
-      text-align: left;
-    }
-
-    /* ...可依需求補充其他 Material Design 風格... */
+/* ...可依需求補充其他 Material Design 風格... */

@@ -80,6 +80,14 @@
     </div>
   </div>
 
+  <!-- loading spinner -->
+  <div id="loadingSpinner">
+    <div>
+      <div class="spinner"></div>
+      <div class="loading-text">資料載入中，請稍候...</div>
+    </div>
+  </div>
+
   <script>
     let data = [];
     const errorMessageDiv = document.createElement("div");
@@ -93,27 +101,41 @@
       ]);
     };
 
+    // loading spinner 控制
+    function showLoading() {
+      document.getElementById("loadingSpinner").style.display = "flex";
+    }
+    function hideLoading() {
+      document.getElementById("loadingSpinner").style.display = "none";
+    }
+
     // 先嘗試從 API 取得資料，失敗時再 fallback 到 data.json
     const API_URL = "http://localhost:8080/ins/api/customer/getSchemaD"; // 請替換為實際 API
 
     function loadDataFromJson() {
-    fetchWithTimeout('data.json')
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then(jsonData => {
-        data = jsonData;
-        console.log('Data loaded from data.json:', data);
-      })
-      .catch(error => {
-        console.error('Error loading data from data.json:', error);
-        errorMessageDiv.textContent = "⚠️ 無法載入資料，請檢查檔案是否存在或網路連線是否正常。";
-      });
+      showLoading();
+      fetchWithTimeout('data.json')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(jsonData => {
+          data = jsonData;
+          console.log('Data loaded from data.json:', data);
+        })
+        .catch(error => {
+          console.error('Error loading data from data.json:', error);
+          errorMessageDiv.textContent = "⚠️ 無法載入資料，請檢查檔案是否存在或網路連線是否正常。";
+        })
+        .finally(() => {
+          hideLoading();
+        });
     }
 
+    // 載入時顯示 loading
+    showLoading();
     fetchWithTimeout(API_URL)
       .then(response => {
         if (!response.ok) {
@@ -128,6 +150,9 @@
       .catch(error => {
         console.error('Error loading data from API, fallback to data.json:', error);
         loadDataFromJson();
+      })
+      .finally(() => {
+        hideLoading();
       });
 
     const input = document.getElementById("searchInput");
