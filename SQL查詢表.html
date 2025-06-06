@@ -36,6 +36,7 @@
         <th>資料表說明</th>
         <th>欄位名稱</th>
         <th>欄位說明</th>
+        <th>變更時間</th> <!-- 新增 -->
       </tr>
     </thead>
     <tbody></tbody>
@@ -181,12 +182,30 @@
           tr.appendChild(selectorTd);
           tr.appendChild(moveTd);
 
-          // 加入資料欄位
-          for (const key in row) {
-            const td = document.createElement("td");
-            td.textContent = row[key];
-            tr.appendChild(td);
-          }
+          // 按照表格順序加入資料欄位
+          const schemaTd = document.createElement("td");
+          schemaTd.textContent = row["Schema 名稱"] || "";
+          tr.appendChild(schemaTd);
+
+          const tableTd = document.createElement("td");
+          tableTd.textContent = row["資料表名稱"] || "";
+          tr.appendChild(tableTd);
+
+          const tableDescTd = document.createElement("td");
+          tableDescTd.textContent = row["資料表說明"] || "";
+          tr.appendChild(tableDescTd);
+
+          const fieldTd = document.createElement("td");
+          fieldTd.textContent = row["欄位名稱"] || "";
+          tr.appendChild(fieldTd);
+
+          const fieldDescTd = document.createElement("td");
+          fieldDescTd.textContent = row["欄位說明"] || "";
+          tr.appendChild(fieldDescTd);
+
+          const updateTimeTd = document.createElement("td");
+          updateTimeTd.textContent = row["變更時間"] || "";
+          tr.appendChild(updateTimeTd);
 
           tbody.appendChild(tr);
         });

@@ -114,7 +114,7 @@ body {
     }
 
     #resultTable td:nth-child(7) {
-      max-width: 700px;
+      max-width: 500px;
       white-space: pre-line;
       word-break: break-all;
       overflow-wrap: break-word;
