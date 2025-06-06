@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
+
 <head>
   <meta charset="UTF-8">
   <title>資料表欄位查詢</title>
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
   <h2>📊 B2B資料表欄位中英對照查詢系統</h2>
@@ -51,11 +53,15 @@
 
   <div id="queryResult" class="sql-section" style="display:none;">
     <div class="selection-info" id="selectionInfo"></div>
-    
+
     <div class="sql-tabs">
       <button class="tab-btn active" onclick="showTab('select')">📋 SELECT</button>
       <button class="tab-btn" onclick="showTab('update')">🔄 UPDATE</button>
       <button class="tab-btn" onclick="showTab('insert')">➕ INSERT</button>
+      <button class="tab-btn" onclick="showTab('createTable')">🛠️ CREATE TABLE</button>
+      <button class="tab-btn" onclick="showTab('updateTable')">📝 DROP TABLE</button>
+      <button class="tab-btn" onclick="showTab('addColumn')">➕ ADD COLUMN</button>
+      <button class="tab-btn" onclick="showTab('updateColumn')">📝 UPDATE COLUMN</button>
     </div>
 
     <div id="selectTab" class="tab-content active">
@@ -77,6 +83,30 @@
       <button class="copy-btn" onclick="downloadSql('insert')">⬇️ 下載</button>
       <strong>➕ INSERT 插入語法：</strong>
       <div id="insertSql"></div>
+    </div>
+    <div id="createTableTab" class="tab-content">
+      <button class="copy-btn" onclick="copySql('createTable')">📋 複製</button>
+      <button class="copy-btn" onclick="downloadSql('createTable')">⬇️ 下載</button>
+      <strong>🛠️ CREATE TABLE 建表語法：</strong>
+      <div id="createTableSql"></div>
+    </div>
+    <div id="updateTableTab" class="tab-content">
+      <button class="copy-btn" onclick="copySql('updateTable')">📋 複製</button>
+      <button class="copy-btn" onclick="downloadSql('updateTable')">⬇️ 下載</button>
+      <strong>📝 DROP TABLE 修改表語法：</strong>
+      <div id="updateTableSql"></div>
+    </div>
+    <div id="addColumnTab" class="tab-content">
+      <button class="copy-btn" onclick="copySql('addColumn')">📋 複製</button>
+      <button class="copy-btn" onclick="downloadSql('addColumn')">⬇️ 下載</button>
+      <strong>➕ ADD COLUMN 新增欄位語法：</strong>
+      <div id="addColumnSql"></div>
+    </div>
+    <div id="updateColumnTab" class="tab-content">
+      <button class="copy-btn" onclick="copySql('updateColumn')">📋 複製</button>
+      <button class="copy-btn" onclick="downloadSql('updateColumn')">⬇️ 下載</button>
+      <strong>📝 UPDATE COLUMN 修改欄位語法：</strong>
+      <div id="updateColumnSql"></div>
     </div>
   </div>
 
@@ -283,7 +313,7 @@
         { value: keywords1, key: "資料表名稱" },
         { value: keywords2, key: "欄位名稱" },
         { value: keywords3, key: "欄位說明" },
-        { value: keywords4, key: "資料表說明"}
+        { value: keywords4, key: "資料表說明" }
       ];
       // 過濾資料，所有有輸入的欄位都需符合
       filtered = data.filter(row =>
@@ -426,10 +456,10 @@
         const schemaName = selector.dataset.schema;
         const row = selector.closest("tr");
         const fieldKey = `${schemaName}.${tableName}.${fieldName}`;
-        
+
         // 清除之前的狀態
         row.classList.remove("selected-where");
-        
+
         // 設置為 SELECT
         selector.dataset.state = "select";
         selector.textContent = "SELECT";
@@ -453,10 +483,10 @@
         const schemaName = selector.dataset.schema;
         const row = selector.closest("tr");
         const fieldKey = `${schemaName}.${tableName}.${fieldName}`;
-        
+
         // 清除之前的狀態
         row.classList.remove("selected-select");
-        
+
         // 設置為 WHERE
         selector.dataset.state = "where";
         selector.textContent = "WHERE";
@@ -480,7 +510,7 @@
         const schemaName = selector.dataset.schema;
         const row = selector.closest("tr");
         const fieldKey = `${schemaName}.${tableName}.${fieldName}`;
-        
+
         // 設置為 BOTH (同時 SELECT 和 WHERE)
         selector.dataset.state = "both";
         selector.textContent = "SELECT+WHERE";
@@ -561,24 +591,40 @@
             joinKeySelectFields: []
           };
         }
+        // 找到原始 data 裡的欄位資訊
+        const origin = data.find(row =>
+          row["Schema 名稱"] === fieldInfo.schemaName &&
+          row["資料表名稱"] === fieldInfo.tableName &&
+          row["欄位名稱"] === fieldInfo.fieldName
+        );
+        // 補齊型別等資訊
+        const fieldFull = {
+          ...fieldInfo,
+          dataType: origin ? origin["資料型別"] : "",
+          length: origin ? origin["長度"] : "",
+          isNullable: origin ? origin["是否可為NULL"] : "",
+          defaultValue: origin ? origin["預設值"] : "",
+          isPK: origin ? origin["PK"] : "",
+          description: origin ? origin["欄位說明"] : ""
+        };
         if (fieldInfo.type === "select") {
-          tableGroups[tableKey].selectFields.push(fieldInfo);
+          tableGroups[tableKey].selectFields.push(fieldFull);
         } else if (fieldInfo.type === "where") {
-          tableGroups[tableKey].whereFields.push(fieldInfo);
+          tableGroups[tableKey].whereFields.push(fieldFull);
         } else if (fieldInfo.type === "both") {
-          tableGroups[tableKey].selectFields.push(fieldInfo);
-          tableGroups[tableKey].whereFields.push(fieldInfo);
+          tableGroups[tableKey].selectFields.push(fieldFull);
+          tableGroups[tableKey].whereFields.push(fieldFull);
         } else if (fieldInfo.type === "joinkey") {
-          tableGroups[tableKey].joinKeyFields.push(fieldInfo);
+          tableGroups[tableKey].joinKeyFields.push(fieldFull);
         } else if (fieldInfo.type === "joinkeysel") {
-          tableGroups[tableKey].joinKeyFields.push(fieldInfo);
-          tableGroups[tableKey].selectFields.push(fieldInfo);
-          tableGroups[tableKey].joinKeySelectFields.push(fieldInfo);
+          tableGroups[tableKey].joinKeyFields.push(fieldFull);
+          tableGroups[tableKey].selectFields.push(fieldFull);
+          tableGroups[tableKey].joinKeySelectFields.push(fieldFull);
         } else if (fieldInfo.type === "joinkeyselwhere") {
-          tableGroups[tableKey].joinKeyFields.push(fieldInfo);
-          tableGroups[tableKey].selectFields.push(fieldInfo);
-          tableGroups[tableKey].whereFields.push(fieldInfo);
-          tableGroups[tableKey].joinKeySelectFields.push(fieldInfo);
+          tableGroups[tableKey].joinKeyFields.push(fieldFull);
+          tableGroups[tableKey].selectFields.push(fieldFull);
+          tableGroups[tableKey].whereFields.push(fieldFull);
+          tableGroups[tableKey].joinKeySelectFields.push(fieldFull);
         }
       });
 
@@ -616,9 +662,9 @@
         const group = tableGroups[tableKey];
         totalSelect += group.selectFields.length;
         totalWhere += group.whereFields.length;
-        
+
         infoHtml += `<div><strong>資料表：${group.schemaName}.${group.tableName}</strong><br>`;
-        
+
         if (group.selectFields.length > 0) {
           infoHtml += `<span class="select-fields">SELECT 欄位 (${group.selectFields.length})：${group.selectFields.map(f => `<code>${f.fieldName}</code>`).join(", ")}</span><br>`;
         }
@@ -634,13 +680,13 @@
 
     function generateSingleTableSQL(tableGroup) {
       const fullTableName = `[${tableGroup.schemaName}].[${tableGroup.tableName}]`;
-      
+
       // SELECT SQL
       let selectSql = "";
       if (tableGroup.selectFields.length > 0) {
         const columns = tableGroup.selectFields.map(field => `    [${field.fieldName}] /* ${field.description} */`).join(",\n");
         selectSql = `SELECT\n${columns}\nFROM ${fullTableName}`;
-        
+
         if (tableGroup.whereFields.length > 0) {
           const whereConditions = tableGroup.whereFields.map(field => `    [${field.fieldName}] = ? /* ${field.description} */`).join(" AND\n");
           selectSql += `\nWHERE\n${whereConditions}`;
@@ -655,7 +701,7 @@
       if (tableGroup.selectFields.length > 0) {
         const updateSets = tableGroup.selectFields.map(field => `    [${field.fieldName}] = ? /* ${field.description} */`).join(",\n");
         updateSql = `UPDATE ${fullTableName}\nSET\n${updateSets}`;
-        
+
         if (tableGroup.whereFields.length > 0) {
           const whereConditions = tableGroup.whereFields.map(field => `    [${field.fieldName}] = ? /* ${field.description} */`).join(" AND\n");
           updateSql += `\nWHERE\n${whereConditions}`;
@@ -680,25 +726,32 @@
       document.getElementById("selectSql").innerHTML = `<pre>${selectSql}</pre>`;
       document.getElementById("updateSql").innerHTML = `<pre>${updateSql}</pre>`;
       document.getElementById("insertSql").innerHTML = `<pre>${insertSql}</pre>`;
+
+      // 新增這四行，讓 create table 等分頁有內容
+      document.getElementById("createTableSql").innerHTML = `<pre>${generateCreateTableSQL(tableGroup)}</pre>`;
+      document.getElementById("updateTableSql").innerHTML = `<pre>${generateUpdateTableSQL(tableGroup)}</pre>`;
+      document.getElementById("addColumnSql").innerHTML = `<pre>${generateAddColumnSQL(tableGroup)}</pre>`;
+      document.getElementById("updateColumnSql").innerHTML = `<pre>${generateUpdateColumnSQL(tableGroup)}</pre>`;
     }
 
     function generateMultiTableSQL(tableGroups) {
       let selectSqlHtml = '<div class="warning">⚠️ 多個資料表被選中，以下為各資料表的獨立 SQL 語法：</div>';
       let updateSqlHtml = '<div class="warning">⚠️ 多個資料表被選中，以下為各資料表的獨立 SQL 語法：</div>';
       let insertSqlHtml = '<div class="warning">⚠️ 多個資料表被選中，以下為各資料表的獨立 SQL 語法：</div>';
+      let createTableSqlHtml = '';
+      let updateTableSqlHtml = '';
+      let addColumnSqlHtml = '';
+      let updateColumnSqlHtml = '';
 
       Object.keys(tableGroups).forEach(tableKey => {
         const group = tableGroups[tableKey];
-        const fullTableName = `[${group.schemaName}].[${group.tableName}]`;
-        
-        // SELECT
         selectSqlHtml += `<div class="table-section">`;
         selectSqlHtml += `<div class="table-title">📋 ${group.schemaName}.${group.tableName}</div>`;
-        
+
         if (group.selectFields.length > 0) {
           const columns = group.selectFields.map(field => `    [${field.fieldName}]`).join(",\n");
           let sql = `SELECT\n${columns}\nFROM ${fullTableName}`;
-          
+
           if (group.whereFields.length > 0) {
             const whereConditions = group.whereFields.map(field => `    [${field.fieldName}] = ? /* ${field.description} */`).join(" AND\n");
             sql += `\nWHERE\n${whereConditions}`;
@@ -713,11 +766,11 @@
         // UPDATE
         updateSqlHtml += `<div class="table-section">`;
         updateSqlHtml += `<div class="table-title">🔄 ${group.schemaName}.${group.tableName}</div>`;
-        
+
         if (group.selectFields.length > 0) {
           const updateSets = group.selectFields.map(field => `    [${field.fieldName}] = ? /* ${field.description} */`).join(",\n");
           let sql = `UPDATE ${fullTableName}\nSET\n${updateSets}`;
-          
+
           if (group.whereFields.length > 0) {
             const whereConditions = group.whereFields.map(field => `    [${field.fieldName}] = ? /* ${field.description} */`).join(" AND\n");
             sql += `\nWHERE\n${whereConditions}`;
@@ -734,7 +787,7 @@
         // INSERT
         insertSqlHtml += `<div class="table-section">`;
         insertSqlHtml += `<div class="table-title">➕ ${group.schemaName}.${group.tableName}</div>`;
-        
+
         if (group.selectFields.length > 0) {
           const insertColumns = group.selectFields.map(field => `    [${field.fieldName}]`).join(",\n");
           const insertValues = group.selectFields.map(field => `    ? /* ${field.description} */`).join(",\n");
@@ -744,11 +797,20 @@
           insertSqlHtml += `<pre>-- 此資料表沒有選擇要插入的欄位</pre>`;
         }
         insertSqlHtml += `</div>`;
+
+        createTableSqlHtml += `<div class="table-section"><div class="table-title">🛠️ ${group.schemaName}.${group.tableName}</div><pre>${generateCreateTableSQL(group)}</pre></div>`;
+        updateTableSqlHtml += `<div class="table-section"><div class="table-title">📝 ${group.schemaName}.${group.tableName}</div><pre>${generateUpdateTableSQL(group)}</pre></div>`;
+        addColumnSqlHtml += `<div class="table-section"><div class="table-title">➕ ${group.schemaName}.${group.tableName}</div><pre>${generateAddColumnSQL(group)}</pre></div>`;
+        updateColumnSqlHtml += `<div class="table-section"><div class="table-title">📝 ${group.schemaName}.${group.tableName}</div><pre>${generateUpdateColumnSQL(group)}</pre></div>`;
       });
 
       document.getElementById("selectSql").innerHTML = selectSqlHtml;
       document.getElementById("updateSql").innerHTML = updateSqlHtml;
       document.getElementById("insertSql").innerHTML = insertSqlHtml;
+      document.getElementById("createTableSql").innerHTML = createTableSqlHtml;
+      document.getElementById("updateTableSql").innerHTML = updateTableSqlHtml;
+      document.getElementById("addColumnSql").innerHTML = addColumnSqlHtml;
+      document.getElementById("updateColumnSql").innerHTML = updateColumnSqlHtml;
     }
 
     function generateJoinSQL(tableGroups) {
@@ -890,9 +952,9 @@
     }
 
     function getFieldDescription(fieldName, tableName, schemaName) {
-      const field = data.find(row => 
-        row["欄位名稱"] === fieldName && 
-        row["資料表名稱"] === tableName && 
+      const field = data.find(row =>
+        row["欄位名稱"] === fieldName &&
+        row["資料表名稱"] === tableName &&
         row["Schema 名稱"] === schemaName
       );
       return field ? field["欄位說明"] : "";
@@ -911,7 +973,7 @@
     function copySql(type) {
       const sqlElement = document.getElementById(type + "Sql");
       let text = "";
-      
+
       // 提取所有 pre 標籤中的文字
       const preElements = sqlElement.querySelectorAll("pre");
       if (preElements.length > 0) {
@@ -919,14 +981,14 @@
       } else {
         text = sqlElement.textContent;
       }
-      
+
       navigator.clipboard.writeText(text).then(() => {
         const btn = event.target;
         const originalText = btn.textContent;
         const originalBg = btn.style.background;
         btn.textContent = "✅ 已複製";
         btn.style.background = "#27ae60";
-        
+
         setTimeout(() => {
           btn.textContent = originalText;
           btn.style.background = originalBg;
@@ -939,7 +1001,7 @@
         textarea.select();
         document.execCommand("copy");
         document.body.removeChild(textarea);
-        
+
         alert("SQL 已複製到剪貼簿！");
       });
     }
@@ -947,7 +1009,7 @@
     function downloadSql(type) {
       const sqlElement = document.getElementById(type + "Sql");
       let text = "";
-      
+
       // 提取所有 pre 標籤中的文字
       const preElements = sqlElement.querySelectorAll("pre");
       if (preElements.length > 0) {
@@ -955,7 +1017,7 @@
       } else {
         text = sqlElement.textContent;
       }
-      
+
       // 建立一個隱藏的 a 標籤用於下載
       const a = document.createElement("a");
       const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
@@ -967,7 +1029,85 @@
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     }
+
+    function generateCreateTableSQL(tableGroup) {
+      const fullTableName = `[${tableGroup.schemaName}].[${tableGroup.tableName}]`;
+      const typesWithLength = ["nvarchar", "varchar", "char", "nchar", "binary", "varbinary"];
+      const columns = tableGroup.selectFields.map(field => {
+        // 只有特定型別才加 (長度)
+        let typeStr = field.dataType;
+        if (
+          typesWithLength.includes((field.dataType || "").toLowerCase()) &&
+          field.length &&
+          !isNaN(field.length)
+        ) {
+          typeStr += `(${field.length})`;
+        }
+        let col = `  [${field.fieldName}] ${typeStr}`;
+        if (field.isNullable === "否") col += " NOT NULL";
+        if (field.defaultValue) col += ` DEFAULT ${field.defaultValue}`;
+        if (field.isPK === "是") col += " PRIMARY KEY";
+        col += ` /* ${field.description} */`;
+        return col;
+      }).join(",\n");
+      return `CREATE TABLE ${fullTableName} (\n${columns}\n);`;
+    }
+
+    function generateUpdateTableSQL(tableGroup) {
+      // 改為 DROP TABLE 語法
+      const fullTableName = `[${tableGroup.schemaName}].[${tableGroup.tableName}]`;
+      return `DROP TABLE ${fullTableName};`;
+    }
+
+    function generateAddColumnSQL(tableGroup) {
+      const fullTableName = `[${tableGroup.schemaName}].[${tableGroup.tableName}]`;
+      const typesWithLength = ["nvarchar", "varchar", "char", "nchar", "binary", "varbinary"];
+      return tableGroup.selectFields.map(field => {
+        let typeStr = field.dataType;
+        if (
+          typesWithLength.includes((field.dataType || "").toLowerCase()) &&
+          field.length &&
+          !isNaN(field.length)
+        ) {
+          typeStr += `(${field.length})`;
+        }
+        let col = `[${field.fieldName}] ${typeStr}`;
+        if (field.isNullable === "否") col += " NOT NULL";
+        let sql = `ALTER TABLE ${fullTableName} ADD ${col}; /* ${field.description} */`;
+        // 預設值需額外產生 DEFAULT CONSTRAINT
+        if (field.defaultValue) {
+          const constraint = `DF_${tableGroup.tableName}_${field.fieldName}`;
+          sql += `\nALTER TABLE ${fullTableName} ADD CONSTRAINT ${constraint} DEFAULT ${field.defaultValue} FOR [${field.fieldName}];`;
+        }
+        return sql;
+      }).join("\n");
+    }
+
+    function generateUpdateColumnSQL(tableGroup) {
+      const fullTableName = `[${tableGroup.schemaName}].[${tableGroup.tableName}]`;
+      const typesWithLength = ["nvarchar", "varchar", "char", "nchar", "binary", "varbinary"];
+      return tableGroup.selectFields.map(field => {
+        let typeStr = field.dataType;
+        if (
+          typesWithLength.includes((field.dataType || "").toLowerCase()) &&
+          field.length &&
+          !isNaN(field.length)
+        ) {
+          typeStr += `(${field.length})`;
+        }
+        let col = `[${field.fieldName}] ${typeStr}`;
+        if (field.isNullable === "否") col += " NOT NULL";
+        let sql = `ALTER TABLE ${fullTableName} ALTER COLUMN ${col}; /* ${field.description} */`;
+        // 預設值需額外產生 DEFAULT CONSTRAINT
+        if (field.defaultValue) {
+          const constraint = `DF_${tableGroup.tableName}_${field.fieldName}`;
+          sql += `\nALTER TABLE ${fullTableName} ADD CONSTRAINT ${constraint} DEFAULT ${field.defaultValue} FOR [${field.fieldName}];`;
+        }
+        return sql;
+      }).join("\n");
+    }
   </script>
 
 </body>
+
 </html>

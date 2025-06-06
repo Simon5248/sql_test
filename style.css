@@ -298,9 +298,13 @@ body > input[type="text"] {
   border-radius: 0 0 8px 8px;
   padding: 18px 10px 10px 10px;
   box-shadow: 0 1px 4px rgba(60,64,67,0.08);
+  text-align: left;
 }
 .tab-content.active {
   display: block;
+}
+.tab-content pre {
+  text-align: left;
 }
 
 /* ====== SQL 語法區塊 ====== */
