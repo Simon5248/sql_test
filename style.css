@@ -88,9 +88,14 @@ body {
       overflow: hidden;
     }
 
-    #resultTable th, #resultTable td {
-      padding: 10px 8px;
+    #resultTable th,
+    #resultTable td {
       text-align: left;
+    }
+
+    #resultTable td {
+      text-align: left;
+      vertical-align: middle;
     }
 
     #resultTable thead th {
