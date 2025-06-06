@@ -1073,12 +1073,16 @@
         }
         let col = `[${field.fieldName}] ${typeStr}`;
         if (field.isNullable === "否") col += " NOT NULL";
-        let sql = `ALTER TABLE ${fullTableName} ADD ${col}; /* ${field.description} */`;
+        let sql =
+          `IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE Name = N'${field.fieldName}' AND Object_ID = Object_ID(N'${fullTableName}'))\n` +
+          "BEGIN\n" +
+          `  ALTER TABLE ${fullTableName} ADD ${col}; /* ${field.description} */\n`;
         // 預設值需額外產生 DEFAULT CONSTRAINT
         if (field.defaultValue) {
           const constraint = `DF_${tableGroup.tableName}_${field.fieldName}`;
-          sql += `\nALTER TABLE ${fullTableName} ADD CONSTRAINT ${constraint} DEFAULT ${field.defaultValue} FOR [${field.fieldName}];`;
+          sql += `  ALTER TABLE ${fullTableName} ADD CONSTRAINT ${constraint} DEFAULT ${field.defaultValue} FOR [${field.fieldName}];\n`;
         }
+        sql += "END";
         return sql;
       }).join("\n");
     }
@@ -1097,12 +1101,23 @@
         }
         let col = `[${field.fieldName}] ${typeStr}`;
         if (field.isNullable === "否") col += " NOT NULL";
-        let sql = `ALTER TABLE ${fullTableName} ALTER COLUMN ${col}; /* ${field.description} */`;
-        // 預設值需額外產生 DEFAULT CONSTRAINT
+        let sql =
+          `IF EXISTS (SELECT 1 FROM sys.columns WHERE Name = N'${field.fieldName}' AND Object_ID = Object_ID(N'${fullTableName}'))\n` +
+          "BEGIN\n" +
+          `  ALTER TABLE ${fullTableName} ALTER COLUMN ${col}; /* ${field.description} */\n`;
+        // 若有 defaultValue，先 drop default constraint 再 add
         if (field.defaultValue) {
           const constraint = `DF_${tableGroup.tableName}_${field.fieldName}`;
-          sql += `\nALTER TABLE ${fullTableName} ADD CONSTRAINT ${constraint} DEFAULT ${field.defaultValue} FOR [${field.fieldName}];`;
+          sql +=
+            `  DECLARE @defname nvarchar(200);\n` +
+            `  SELECT @defname = d.name\n` +
+            `    FROM sys.default_constraints d\n` +
+            `    JOIN sys.columns c ON d.parent_object_id = c.object_id AND d.parent_column_id = c.column_id\n` +
+            `    WHERE d.parent_object_id = OBJECT_ID(N'${fullTableName}') AND c.name = N'${field.fieldName}';\n` +
+            `  IF @defname IS NOT NULL EXEC('ALTER TABLE ${fullTableName} DROP CONSTRAINT ' + @defname);\n` +
+            `  ALTER TABLE ${fullTableName} ADD CONSTRAINT ${constraint} DEFAULT ${field.defaultValue} FOR [${field.fieldName}];\n`;
         }
+        sql += "END";
         return sql;
       }).join("\n");
     }
