@@ -108,6 +108,13 @@ body {
       background: #e3f2fd;
     }
 
+    #resultTable td:nth-child(7) {
+      max-width: 700px;
+      white-space: pre-line;
+      word-break: break-all;
+      overflow-wrap: break-word;
+    }
+
     .field-selector {
       background: #f5f5f5;
       color: #1976d2;
@@ -327,6 +334,13 @@ body {
       display: inline-block;
       margin: 8px 10px 8px 0;
       vertical-align: middle;
+    }
+
+    #selectSql, #updateSql, #insertSql {
+      text-align: left;
+    }
+    #selectSql pre, #updateSql pre, #insertSql pre {
+      text-align: left;
     }
 
     /* ...可依需求補充其他 Material Design 風格... */
