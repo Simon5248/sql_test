@@ -1054,9 +1054,9 @@
     }
 
     function generateUpdateTableSQL(tableGroup) {
-      // 改為 DROP TABLE 語法
+      // 改為 DROP TABLE IF EXISTS 語法
       const fullTableName = `[${tableGroup.schemaName}].[${tableGroup.tableName}]`;
-      return `DROP TABLE ${fullTableName};`;
+      return `DROP TABLE IF EXISTS ${fullTableName};`;
     }
 
     function generateAddColumnSQL(tableGroup) {
