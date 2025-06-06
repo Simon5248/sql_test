@@ -86,7 +86,7 @@
     };
 
     // 先嘗試從 API 取得資料，失敗時再 fallback 到 data.json
-    const API_URL = "https://your-api-endpoint.com/getSqlFields"; // 請替換為實際 API
+    const API_URL = "http://localhost:8080/ins/api/customer/getSchemaD"; // 請替換為實際 API
 
     function loadDataFromJson() {
     fetchWithTimeout('data.json')
@@ -133,10 +133,11 @@
     // 新增：join 順序調整功能
     let joinOrder = []; // 儲存 join 順序（tableKey 陣列）
 
+    // 重新渲染查詢結果表格
     function renderTable(filteredData) {
-      tbody.innerHTML = "";
-      queryDiv.style.display = "none";
-      selectedFields.clear();
+      tbody.innerHTML = ""; // 清空表格內容
+      queryDiv.style.display = "none"; // 隱藏 SQL 區塊
+      selectedFields.clear(); // 清空已選欄位
       currentMatched = filteredData;
 
       // 重新產生 joinOrder
@@ -148,7 +149,7 @@
           tr.className = "field-row";
           tr.dataset.index = index;
 
-          // 加入選擇器
+          // 加入欄位選擇按鈕
           const selectorTd = document.createElement("td");
           const selector = document.createElement("button");
           selector.className = "field-selector";
@@ -160,7 +161,7 @@
           selector.addEventListener("click", handleFieldSelection);
           selectorTd.appendChild(selector);
 
-          // 新增：如果有 join key 欄位，顯示上下移動按鈕
+          // 加入上下移動按鈕（join 順序）
           const tableKey = `${row["Schema 名稱"]}.${row["資料表名稱"]}`;
           if (!joinOrder.includes(tableKey)) {
             joinOrder.push(tableKey);
@@ -180,7 +181,7 @@
           tr.appendChild(selectorTd);
           tr.appendChild(moveTd);
 
-          // 加入其他欄位
+          // 加入資料欄位
           for (const key in row) {
             const td = document.createElement("td");
             td.textContent = row[key];
@@ -194,7 +195,7 @@
 
     // 新增：調整 join 順序的函式
     function moveJoinOrder(event, tableKey, direction) {
-      event.stopPropagation();
+      event.stopPropagation(); // 防止事件冒泡
       const idx = joinOrder.indexOf(tableKey);
       if (idx === -1) return;
       const newIdx = idx + direction;
@@ -205,8 +206,9 @@
       generateSQL();
     }
 
+    // 過濾資料（依據多個輸入框關鍵字）
     function filterData() {
-      // 處理逗號分割的關鍵字
+      // 處理逗號分割的關鍵字，並轉小寫
       const getKeywords = (inputValue) => {
         return inputValue.trim()
           .split(',')
@@ -214,21 +216,22 @@
           .filter(kw => kw);
       };
 
-      const keywords1 = getKeywords(input.value);   // 對應「資料表名稱」
-      const keywords2 = getKeywords(input2.value);  // 對應「欄位名稱」  
-      const keywords3 = getKeywords(input3.value);  // 對應「欄位說明」
-      const keywords4 = getKeywords(input4.value);  // 對應「資料表說明」
+      // 取得各輸入框的關鍵字
+      const keywords1 = getKeywords(input.value);   // 資料表名稱
+      const keywords2 = getKeywords(input2.value);  // 欄位名稱  
+      const keywords3 = getKeywords(input3.value);  // 欄位說明
+      const keywords4 = getKeywords(input4.value);  // 資料表說明
 
       let filtered = data;
 
-      // 7種可能的組合（2^3 - 1，排除全空的情況）
-      
+      // 建立過濾條件陣列
       const filters = [
-      { value: keywords1, key: "資料表名稱" },
-      { value: keywords2, key: "欄位名稱" },
-      { value: keywords3, key: "欄位說明" },
-      { value: keywords4, key: "資料表說明"}
+        { value: keywords1, key: "資料表名稱" },
+        { value: keywords2, key: "欄位名稱" },
+        { value: keywords3, key: "欄位說明" },
+        { value: keywords4, key: "資料表說明"}
       ];
+      // 過濾資料，所有有輸入的欄位都需符合
       filtered = data.filter(row =>
         filters.every(f =>
           f.value.length === 0 ||
@@ -240,7 +243,7 @@
       );
       // 如果所有輸入框都是空的，filtered 保持為原始 data
       
-      renderTable(filtered);
+      renderTable(filtered); // 渲染結果
     }
 
     input.addEventListener("input", filterData);
