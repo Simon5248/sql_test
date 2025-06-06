@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>資料表欄位查詢</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <h2>📊 B2B資料表欄位中英對照查詢系統</h2>
+
+  <!-- 輸入框區塊改為兩行，每行兩個輸入框 -->
+  <div class="input-row">
+    <input type="text" id="searchInput" placeholder="🔍 請輸入資料表名稱（英文）">
+    <input type="text" id="searchInput4" placeholder="🔍 請輸入資料表中文說明（中文）">
+  </div>
+  <div class="input-row">
+    <input type="text" id="searchInput2" placeholder="🔍 請輸入欄位名稱（英文）">
+    <input type="text" id="searchInput3" placeholder="🔍 請輸入欄位中文說明（中文）">
+  </div>
+  <div class="input-row">
+    <input type="date" id="changeTimeStart" placeholder="變更時間起">
+    <input type="date" id="changeTimeEnd" placeholder="變更時間迄">
+    <label>
+      <input type="checkbox" id="changeTimeNotNone"> 只顯示有變更時間
+    </label>
+  </div>
+  <div class="controls">
+    <button class="btn" onclick="selectAllForSelect()">🔍 全選為 SELECT</button>
+    <button class="btn" onclick="selectAllForWhere()">🎯 全選為 WHERE</button>
+    <button class="btn" onclick="selectAllForBoth()">🟧 全選為 SELECT + WHERE</button>
+    <button class="btn" onclick="clearSelection()">❌ 清除選擇</button>
+    <button class="btn" onclick="generateSQL()">⚡ 生成 SQL</button>
+  </div>
+
+  <table id="resultTable">
+    <thead>
+      <tr>
+        <th>欄位組合選項</th>
+        <th>順序</th>
+        <th>Schema 名稱</th>
+        <th>資料表名稱</th>
+        <th>資料表說明</th>
+        <th>欄位名稱</th>
+        <th>欄位說明</th>
+        <th>變更時間</th> <!-- 新增 -->
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <div id="queryResult" class="sql-section" style="display:none;">
+    <div class="selection-info" id="selectionInfo"></div>
+    
+    <div class="sql-tabs">
+      <button class="tab-btn active" onclick="showTab('select')">📋 SELECT</button>
+      <button class="tab-btn" onclick="showTab('update')">🔄 UPDATE</button>
+      <button class="tab-btn" onclick="showTab('insert')">➕ INSERT</button>
+    </div>
+
+    <div id="selectTab" class="tab-content active">
+      <button class="copy-btn" onclick="copySql('select')">📋 複製</button>
+      <button class="copy-btn" onclick="downloadSql('select')">⬇️ 下載</button>
+      <strong>🔍 SELECT 查詢語法：</strong>
+      <div id="selectSql"></div>
+    </div>
+
+    <div id="updateTab" class="tab-content">
+      <button class="copy-btn" onclick="copySql('update')">📋 複製</button>
+      <button class="copy-btn" onclick="downloadSql('update')">⬇️ 下載</button>
+      <strong>🔄 UPDATE 更新語法：</strong>
+      <div id="updateSql"></div>
+    </div>
+
+    <div id="insertTab" class="tab-content">
+      <button class="copy-btn" onclick="copySql('insert')">📋 複製</button>
+      <button class="copy-btn" onclick="downloadSql('insert')">⬇️ 下載</button>
+      <strong>➕ INSERT 插入語法：</strong>
+      <div id="insertSql"></div>
+    </div>
+  </div>
+
+  <!-- loading spinner -->
+  <div id="loadingSpinner">
+    <div>
+      <div class="spinner"></div>
+      <div class="loading-text">資料載入中，請稍候...</div>
+    </div>
+  </div>
+
+  <script>
+    let data = [];
+    const errorMessageDiv = document.createElement("div");
+    errorMessageDiv.style.color = "red";
+    const fetchWithTimeout = (url, timeout = 5000) => {
+      return Promise.race([
+        fetch(url),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Request timed out')), timeout)
+        )
+      ]);
+    };
+
+    // loading spinner 控制
+    function showLoading() {
+      document.getElementById("loadingSpinner").style.display = "flex";
+    }
+    function hideLoading() {
+      document.getElementById("loadingSpinner").style.display = "none";
+    }
+
+    // 先嘗試從 API 取得資料，失敗時再 fallback 到 data.json
+    const API_URL = "http://localhost:8080/ins/api/customer/getSchemaD"; // 請替換為實際 API
+
+    function loadDataFromJson() {
+      showLoading();
+      fetchWithTimeout('data.json')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(jsonData => {
+          data = jsonData;
+          console.log('Data loaded from data.json:', data);
+        })
+        .catch(error => {
+          console.error('Error loading data from data.json:', error);
+          errorMessageDiv.textContent = "⚠️ 無法載入資料，請檢查檔案是否存在或網路連線是否正常。";
+        })
+        .finally(() => {
+          hideLoading();
+        });
+    }
+
+    // 載入時顯示 loading
+    showLoading();
+    fetchWithTimeout(API_URL)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(jsonData => {
+        data = jsonData;
+        console.log('Data loaded from API:', data);
+      })
+      .catch(error => {
+        console.error('Error loading data from API, fallback to data.json:', error);
+        loadDataFromJson();
+      })
+      .finally(() => {
+        hideLoading();
+      });
+
+    const input = document.getElementById("searchInput");
+    const input2 = document.getElementById("searchInput2");
+    const input3 = document.getElementById("searchInput3");
+    const input4 = document.getElementById("searchInput4");
+    const changeTimeStart = document.getElementById("changeTimeStart");
+    const changeTimeEnd = document.getElementById("changeTimeEnd");
+    const changeTimeNotNone = document.getElementById("changeTimeNotNone");
+    const tbody = document.querySelector("#resultTable tbody");
+    const queryDiv = document.getElementById("queryResult");
+    let currentMatched = [];
+    let selectedFields = new Map(); // 改用 Map 來儲存欄位資訊，key: fieldName, value: {type, tableInfo}
+    // 新增：join 順序調整功能
+    let joinOrder = []; // 儲存 join 順序（tableKey 陣列）
+
+    // 重新渲染查詢結果表格
+    function renderTable(filteredData) {
+      tbody.innerHTML = ""; // 清空表格內容
+      queryDiv.style.display = "none"; // 隱藏 SQL 區塊
+      selectedFields.clear(); // 清空已選欄位
+      currentMatched = filteredData;
+
+      // 重新產生 joinOrder
+      joinOrder = [];
+
+      if (currentMatched.length > 0) {
+        currentMatched.forEach((row, index) => {
+          const tr = document.createElement("tr");
+          tr.className = "field-row";
+          tr.dataset.index = index;
+
+          // 加入欄位選擇按鈕
+          const selectorTd = document.createElement("td");
+          const selector = document.createElement("button");
+          selector.className = "field-selector";
+          selector.textContent = "未選擇";
+          selector.dataset.field = row["欄位名稱"];
+          selector.dataset.table = row["資料表名稱"];
+          selector.dataset.schema = row["Schema 名稱"];
+          selector.dataset.state = "none";
+          selector.addEventListener("click", handleFieldSelection);
+          selectorTd.appendChild(selector);
+
+          // 加入上下移動按鈕（join 順序）
+          const tableKey = `${row["Schema 名稱"]}.${row["資料表名稱"]}`;
+          if (!joinOrder.includes(tableKey)) {
+            joinOrder.push(tableKey);
+          }
+          const moveTd = document.createElement("td");
+          moveTd.style.minWidth = "60px";
+          moveTd.style.textAlign = "center";
+          moveTd.innerHTML = `
+  <button class="btn-move-up" title="上移" data-tablekey="${tableKey}" onclick="moveJoinOrder(event, '${tableKey}', -1)">
+    <span class="material-icons">up</span>
+  </button>
+  <button class="btn-move-down" title="下移" data-tablekey="${tableKey}" onclick="moveJoinOrder(event, '${tableKey}', 1)">
+    <span class="material-icons">down</span>
+  </button>
+`;
+
+          tr.appendChild(selectorTd);
+          tr.appendChild(moveTd);
+
+          // 按照表格順序加入資料欄位
+          const schemaTd = document.createElement("td");
+          schemaTd.textContent = row["Schema 名稱"] || "";
+          tr.appendChild(schemaTd);
+
+          const tableTd = document.createElement("td");
+          tableTd.textContent = row["資料表名稱"] || "";
+          tr.appendChild(tableTd);
+
+          const tableDescTd = document.createElement("td");
+          tableDescTd.textContent = row["資料表說明"] || "";
+          tr.appendChild(tableDescTd);
+
+          const fieldTd = document.createElement("td");
+          fieldTd.textContent = row["欄位名稱"] || "";
+          tr.appendChild(fieldTd);
+
+          const fieldDescTd = document.createElement("td");
+          fieldDescTd.textContent = row["欄位說明"] || "";
+          tr.appendChild(fieldDescTd);
+
+          const updateTimeTd = document.createElement("td");
+          updateTimeTd.textContent = row["變更時間"] || "";
+          tr.appendChild(updateTimeTd);
+
+          tbody.appendChild(tr);
+        });
+      }
+    }
+
+    // 新增：調整 join 順序的函式
+    function moveJoinOrder(event, tableKey, direction) {
+      event.stopPropagation(); // 防止事件冒泡
+      const idx = joinOrder.indexOf(tableKey);
+      if (idx === -1) return;
+      const newIdx = idx + direction;
+      if (newIdx < 0 || newIdx >= joinOrder.length) return;
+      // 交換順序
+      [joinOrder[idx], joinOrder[newIdx]] = [joinOrder[newIdx], joinOrder[idx]];
+      // 重新產生 SQL
+      generateSQL();
+    }
+
+    // 過濾資料（依據多個輸入框關鍵字）
+    function filterData() {
+      // 處理逗號分割的關鍵字，並轉小寫
+      const getKeywords = (inputValue) => {
+        return inputValue.trim()
+          .split(',')
+          .map(kw => kw.trim().toLowerCase())
+          .filter(kw => kw);
+      };
+
+      // 取得各輸入框的關鍵字
+      const keywords1 = getKeywords(input.value);   // 資料表名稱
+      const keywords2 = getKeywords(input2.value);  // 欄位名稱  
+      const keywords3 = getKeywords(input3.value);  // 欄位說明
+      const keywords4 = getKeywords(input4.value);  // 資料表說明
+
+      let filtered = data;
+
+      // 建立過濾條件陣列
+      const filters = [
+        { value: keywords1, key: "資料表名稱" },
+        { value: keywords2, key: "欄位名稱" },
+        { value: keywords3, key: "欄位說明" },
+        { value: keywords4, key: "資料表說明"}
+      ];
+      // 過濾資料，所有有輸入的欄位都需符合
+      filtered = data.filter(row =>
+        filters.every(f =>
+          f.value.length === 0 ||
+          f.value.some(kw => {
+            const cell = (row[f.key] || "").toString().trim().toLowerCase();
+            return cell.includes(kw);
+          })
+        )
+      );
+
+      // 變更時間區間查詢
+      if (changeTimeStart.value || changeTimeEnd.value) {
+        filtered = filtered.filter(row => {
+          const val = row["變更時間"];
+          if (!val || val === "無") return false;
+          // 只取日期部分
+          const dateStr = val.slice(0, 10);
+          if (changeTimeStart.value && dateStr < changeTimeStart.value) return false;
+          if (changeTimeEnd.value && dateStr > changeTimeEnd.value) return false;
+          return true;
+        });
+      }
+
+      // 只顯示有變更時間（不為"無"）
+      if (changeTimeNotNone.checked) {
+        filtered = filtered.filter(row => row["變更時間"] && row["變更時間"] !== "無");
+      }
+
+      renderTable(filtered);
+    }
+
+    input.addEventListener("input", filterData);
+    input2.addEventListener("input", filterData);
+    input3.addEventListener("input", filterData);
+    input4.addEventListener("input", filterData);
+    changeTimeStart.addEventListener("input", filterData);
+    changeTimeEnd.addEventListener("input", filterData);
+    changeTimeNotNone.addEventListener("change", filterData);
+
+    function handleFieldSelection(e) {
+      e.stopPropagation();
+      const selector = e.target;
+      const fieldName = selector.dataset.field;
+      const tableName = selector.dataset.table;
+      const schemaName = selector.dataset.schema;
+      const row = selector.closest("tr");
+      const fieldKey = `${schemaName}.${tableName}.${fieldName}`;
+
+      // 狀態循環：none → select → where → both → joinkey → joinkeysel → joinkeyselwhere → none
+      switch (selector.dataset.state) {
+        case "none":
+          selector.dataset.state = "select";
+          selector.textContent = "SELECT";
+          selector.className = "field-selector select";
+          selectedFields.set(fieldKey, {
+            type: "select",
+            fieldName, tableName, schemaName,
+            description: getFieldDescription(fieldName, tableName, schemaName)
+          });
+          row.classList.add("selected-select");
+          row.classList.remove("selected-where", "selected-both", "selected-joinkey", "selected-joinkeysel", "selected-joinkeyselwhere");
+          break;
+        case "select":
+          selector.dataset.state = "where";
+          selector.textContent = "WHERE";
+          selector.className = "field-selector where";
+          selectedFields.set(fieldKey, {
+            type: "where",
+            fieldName, tableName, schemaName,
+            description: getFieldDescription(fieldName, tableName, schemaName)
+          });
+          row.classList.add("selected-where");
+          row.classList.remove("selected-select", "selected-both", "selected-joinkey", "selected-joinkeysel", "selected-joinkeyselwhere");
+          break;
+        case "where":
+          selector.dataset.state = "both";
+          selector.textContent = "SELECT+WHERE";
+          selector.className = "field-selector both";
+          selectedFields.set(fieldKey, {
+            type: "both",
+            fieldName, tableName, schemaName,
+            description: getFieldDescription(fieldName, tableName, schemaName)
+          });
+          row.classList.add("selected-both");
+          row.classList.remove("selected-select", "selected-where", "selected-joinkey", "selected-joinkeysel", "selected-joinkeyselwhere");
+          break;
+        case "both":
+          selector.dataset.state = "joinkey";
+          selector.textContent = "JOIN KEY";
+          selector.className = "field-selector joinkey";
+          selectedFields.set(fieldKey, {
+            type: "joinkey",
+            fieldName, tableName, schemaName,
+            description: getFieldDescription(fieldName, tableName, schemaName)
+          });
+          row.classList.add("selected-joinkey");
+          row.classList.remove("selected-select", "selected-where", "selected-both", "selected-joinkeysel", "selected-joinkeyselwhere");
+          break;
+        case "joinkey":
+          selector.dataset.state = "joinkeysel";
+          selector.textContent = "JOIN KEY+SELECT";
+          selector.className = "field-selector joinkeysel";
+          selectedFields.set(fieldKey, {
+            type: "joinkeysel",
+            fieldName, tableName, schemaName,
+            description: getFieldDescription(fieldName, tableName, schemaName)
+          });
+          row.classList.add("selected-joinkeysel");
+          row.classList.remove("selected-select", "selected-where", "selected-both", "selected-joinkey", "selected-joinkeyselwhere");
+          break;
+        case "joinkeysel":
+          selector.dataset.state = "joinkeyselwhere";
+          selector.textContent = "JOIN KEY+SELECT+WHERE";
+          selector.className = "field-selector joinkeyselwhere";
+          selectedFields.set(fieldKey, {
+            type: "joinkeyselwhere",
+            fieldName, tableName, schemaName,
+            description: getFieldDescription(fieldName, tableName, schemaName)
+          });
+          row.classList.add("selected-joinkeyselwhere");
+          row.classList.remove("selected-select", "selected-where", "selected-both", "selected-joinkey", "selected-joinkeysel");
+          break;
+        case "joinkeyselwhere":
+          selector.dataset.state = "none";
+          selector.textContent = "未選擇";
+          selector.className = "field-selector";
+          selectedFields.delete(fieldKey);
+          row.classList.remove("selected-select", "selected-where", "selected-both", "selected-joinkey", "selected-joinkeysel", "selected-joinkeyselwhere");
+          break;
+      }
+    }
+
+    function selectAllForSelect() {
+      const selectors = document.querySelectorAll(".field-selector");
+      selectors.forEach(selector => {
+        const fieldName = selector.dataset.field;
+        const tableName = selector.dataset.table;
+        const schemaName = selector.dataset.schema;
+        const row = selector.closest("tr");
+        const fieldKey = `${schemaName}.${tableName}.${fieldName}`;
+        
+        // 清除之前的狀態
+        row.classList.remove("selected-where");
+        
+        // 設置為 SELECT
+        selector.dataset.state = "select";
+        selector.textContent = "SELECT";
+        selector.className = "field-selector select";
+        selectedFields.set(fieldKey, {
+          type: "select",
+          fieldName: fieldName,
+          tableName: tableName,
+          schemaName: schemaName,
+          description: getFieldDescription(fieldName, tableName, schemaName)
+        });
+        row.classList.add("selected-select");
+      });
+    }
+
+    function selectAllForWhere() {
+      const selectors = document.querySelectorAll(".field-selector");
+      selectors.forEach(selector => {
+        const fieldName = selector.dataset.field;
+        const tableName = selector.dataset.table;
+        const schemaName = selector.dataset.schema;
+        const row = selector.closest("tr");
+        const fieldKey = `${schemaName}.${tableName}.${fieldName}`;
+        
+        // 清除之前的狀態
+        row.classList.remove("selected-select");
+        
+        // 設置為 WHERE
+        selector.dataset.state = "where";
+        selector.textContent = "WHERE";
+        selector.className = "field-selector where";
+        selectedFields.set(fieldKey, {
+          type: "where",
+          fieldName: fieldName,
+          tableName: tableName,
+          schemaName: schemaName,
+          description: getFieldDescription(fieldName, tableName, schemaName)
+        });
+        row.classList.add("selected-where");
+      });
+    }
+
+    function selectAllForBoth() {
+      const selectors = document.querySelectorAll(".field-selector");
+      selectors.forEach(selector => {
+        const fieldName = selector.dataset.field;
+        const tableName = selector.dataset.table;
+        const schemaName = selector.dataset.schema;
+        const row = selector.closest("tr");
+        const fieldKey = `${schemaName}.${tableName}.${fieldName}`;
+        
+        // 設置為 BOTH (同時 SELECT 和 WHERE)
+        selector.dataset.state = "both";
+        selector.textContent = "SELECT+WHERE";
+        selector.className = "field-selector both";
+        selectedFields.set(fieldKey, {
+          type: "both",
+          fieldName: fieldName,
+          tableName: tableName,
+          schemaName: schemaName,
+          description: getFieldDescription(fieldName, tableName, schemaName)
+        });
+        row.classList.add("selected-both");
+        row.classList.remove("selected-select", "selected-where");
+      });
+    }
+
+    function clearSelection() {
+      const selectors = document.querySelectorAll(".field-selector");
+      selectors.forEach(selector => {
+        const row = selector.closest("tr");
+        selector.dataset.state = "none";
+        selector.textContent = "未選擇";
+        selector.className = "field-selector";
+        row.classList.remove("selected-select", "selected-where");
+      });
+      selectedFields.clear();
+      queryDiv.style.display = "none";
+    }
+
+    function generateSQL() {
+      if (selectedFields.size === 0) {
+        alert("請先選擇要操作的欄位！");
+        return;
+      }
+
+      // 按資料表分組
+      const tableGroups = {};
+      selectedFields.forEach((fieldInfo, fieldKey) => {
+        const tableKey = `${fieldInfo.schemaName}.${fieldInfo.tableName}`;
+        if (!tableGroups[tableKey]) {
+          tableGroups[tableKey] = {
+            schemaName: fieldInfo.schemaName,
+            tableName: fieldInfo.tableName,
+            selectFields: [],
+            whereFields: [],
+            joinKeyFields: [],
+            joinKeySelectFields: []
+          };
+        }
+        if (fieldInfo.type === "select") {
+          tableGroups[tableKey].selectFields.push(fieldInfo);
+        } else if (fieldInfo.type === "where") {
+          tableGroups[tableKey].whereFields.push(fieldInfo);
+        } else if (fieldInfo.type === "both") {
+          tableGroups[tableKey].selectFields.push(fieldInfo);
+          tableGroups[tableKey].whereFields.push(fieldInfo);
+        } else if (fieldInfo.type === "joinkey") {
+          tableGroups[tableKey].joinKeyFields.push(fieldInfo);
+        } else if (fieldInfo.type === "joinkeysel") {
+          tableGroups[tableKey].joinKeyFields.push(fieldInfo);
+          tableGroups[tableKey].selectFields.push(fieldInfo);
+          tableGroups[tableKey].joinKeySelectFields.push(fieldInfo);
+        } else if (fieldInfo.type === "joinkeyselwhere") {
+          tableGroups[tableKey].joinKeyFields.push(fieldInfo);
+          tableGroups[tableKey].selectFields.push(fieldInfo);
+          tableGroups[tableKey].whereFields.push(fieldInfo);
+          tableGroups[tableKey].joinKeySelectFields.push(fieldInfo);
+        }
+      });
+
+      const tableCount = Object.keys(tableGroups).length;
+      updateSelectionInfo(tableGroups);
+
+      if (tableCount === 1) {
+        // 單一資料表
+        const tableKey = Object.keys(tableGroups)[0];
+        const tableGroup = tableGroups[tableKey];
+        generateSingleTableSQL(tableGroup);
+      } else {
+        // 多表時，需判斷是否有 joinKey 或 joinKeysel
+        let hasJoinKey = false;
+        Object.values(tableGroups).forEach(group => {
+          if (group.joinKeyFields.length > 0) hasJoinKey = true;
+        });
+
+        if (hasJoinKey) {
+          generateJoinSQL(tableGroups);
+        } else {
+          generateMultiTableSQL(tableGroups);
+        }
+      }
+
+      queryDiv.style.display = "block";
+    }
+
+    function updateSelectionInfo(tableGroups) {
+      let infoHtml = "";
+      let totalSelect = 0;
+      let totalWhere = 0;
+
+      Object.keys(tableGroups).forEach(tableKey => {
+        const group = tableGroups[tableKey];
+        totalSelect += group.selectFields.length;
+        totalWhere += group.whereFields.length;
+        
+        infoHtml += `<div><strong>資料表：${group.schemaName}.${group.tableName}</strong><br>`;
+        
+        if (group.selectFields.length > 0) {
+          infoHtml += `<span class="select-fields">SELECT 欄位 (${group.selectFields.length})：${group.selectFields.map(f => `<code>${f.fieldName}</code>`).join(", ")}</span><br>`;
+        }
+        if (group.whereFields.length > 0) {
+          infoHtml += `<span class="where-fields">WHERE 條件 (${group.whereFields.length})：${group.whereFields.map(f => `<code>${f.fieldName}</code>`).join(", ")}</span><br>`;
+        }
+        infoHtml += `</div><br>`;
+      });
+
+      infoHtml = `<div><strong>總計：SELECT (${totalSelect}) / WHERE (${totalWhere})</strong></div><br>` + infoHtml;
+      document.getElementById("selectionInfo").innerHTML = infoHtml;
+    }
+
+    function generateSingleTableSQL(tableGroup) {
+      const fullTableName = `[${tableGroup.schemaName}].[${tableGroup.tableName}]`;
+      
+      // SELECT SQL
+      let selectSql = "";
+      if (tableGroup.selectFields.length > 0) {
+        const columns = tableGroup.selectFields.map(field => `    [${field.fieldName}] /* ${field.description} */`).join(",\n");
+        selectSql = `SELECT\n${columns}\nFROM ${fullTableName}`;
+        
+        if (tableGroup.whereFields.length > 0) {
+          const whereConditions = tableGroup.whereFields.map(field => `    [${field.fieldName}] = ? /* ${field.description} */`).join(" AND\n");
+          selectSql += `\nWHERE\n${whereConditions}`;
+        }
+        selectSql += ";";
+      } else {
+        selectSql = "-- 請先選擇 SELECT 欄位";
+      }
+
+      // UPDATE SQL
+      let updateSql = "";
+      if (tableGroup.selectFields.length > 0) {
+        const updateSets = tableGroup.selectFields.map(field => `    [${field.fieldName}] = ? /* ${field.description} */`).join(",\n");
+        updateSql = `UPDATE ${fullTableName}\nSET\n${updateSets}`;
+        
+        if (tableGroup.whereFields.length > 0) {
+          const whereConditions = tableGroup.whereFields.map(field => `    [${field.fieldName}] = ? /* ${field.description} */`).join(" AND\n");
+          updateSql += `\nWHERE\n${whereConditions}`;
+        } else {
+          updateSql += `\nWHERE\n    /* 請加入適當的條件或選擇 WHERE 欄位 */\n    [主鍵欄位] = ?`;
+        }
+        updateSql += ";";
+      } else {
+        updateSql = "-- 請先選擇要更新的欄位 (使用 SELECT 選項)";
+      }
+
+      // INSERT SQL
+      let insertSql = "";
+      if (tableGroup.selectFields.length > 0) {
+        const insertColumns = tableGroup.selectFields.map(field => `    [${field.fieldName}]`).join(",\n");
+        const insertValues = tableGroup.selectFields.map(field => `    ? /* ${field.description} */`).join(",\n");
+        insertSql = `INSERT INTO ${fullTableName}\n(\n${insertColumns}\n)\nVALUES\n(\n${insertValues}\n);`;
+      } else {
+        insertSql = "-- 請先選擇要插入的欄位 (使用 SELECT 選項)";
+      }
+
+      document.getElementById("selectSql").innerHTML = `<pre>${selectSql}</pre>`;
+      document.getElementById("updateSql").innerHTML = `<pre>${updateSql}</pre>`;
+      document.getElementById("insertSql").innerHTML = `<pre>${insertSql}</pre>`;
+    }
+
+    function generateMultiTableSQL(tableGroups) {
+      let selectSqlHtml = '<div class="warning">⚠️ 多個資料表被選中，以下為各資料表的獨立 SQL 語法：</div>';
+      let updateSqlHtml = '<div class="warning">⚠️ 多個資料表被選中，以下為各資料表的獨立 SQL 語法：</div>';
+      let insertSqlHtml = '<div class="warning">⚠️ 多個資料表被選中，以下為各資料表的獨立 SQL 語法：</div>';
+
+      Object.keys(tableGroups).forEach(tableKey => {
+        const group = tableGroups[tableKey];
+        const fullTableName = `[${group.schemaName}].[${group.tableName}]`;
+        
+        // SELECT
+        selectSqlHtml += `<div class="table-section">`;
+        selectSqlHtml += `<div class="table-title">📋 ${group.schemaName}.${group.tableName}</div>`;
+        
+        if (group.selectFields.length > 0) {
+          const columns = group.selectFields.map(field => `    [${field.fieldName}]`).join(",\n");
+          let sql = `SELECT\n${columns}\nFROM ${fullTableName}`;
+          
+          if (group.whereFields.length > 0) {
+            const whereConditions = group.whereFields.map(field => `    [${field.fieldName}] = ? /* ${field.description} */`).join(" AND\n");
+            sql += `\nWHERE\n${whereConditions}`;
+          }
+          sql += ";";
+          selectSqlHtml += `<pre>${sql}</pre>`;
+        } else {
+          selectSqlHtml += `<pre>-- 此資料表沒有選擇 SELECT 欄位</pre>`;
+        }
+        selectSqlHtml += `</div>`;
+
+        // UPDATE
+        updateSqlHtml += `<div class="table-section">`;
+        updateSqlHtml += `<div class="table-title">🔄 ${group.schemaName}.${group.tableName}</div>`;
+        
+        if (group.selectFields.length > 0) {
+          const updateSets = group.selectFields.map(field => `    [${field.fieldName}] = ? /* ${field.description} */`).join(",\n");
+          let sql = `UPDATE ${fullTableName}\nSET\n${updateSets}`;
+          
+          if (group.whereFields.length > 0) {
+            const whereConditions = group.whereFields.map(field => `    [${field.fieldName}] = ? /* ${field.description} */`).join(" AND\n");
+            sql += `\nWHERE\n${whereConditions}`;
+          } else {
+            sql += `\nWHERE\n    /* 請加入適當的條件或選擇 WHERE 欄位 */\n    [主鍵欄位] = ?`;
+          }
+          sql += ";";
+          updateSqlHtml += `<pre>${sql}</pre>`;
+        } else {
+          updateSqlHtml += `<pre>-- 此資料表沒有選擇要更新的欄位</pre>`;
+        }
+        updateSqlHtml += `</div>`;
+
+        // INSERT
+        insertSqlHtml += `<div class="table-section">`;
+        insertSqlHtml += `<div class="table-title">➕ ${group.schemaName}.${group.tableName}</div>`;
+        
+        if (group.selectFields.length > 0) {
+          const insertColumns = group.selectFields.map(field => `    [${field.fieldName}]`).join(",\n");
+          const insertValues = group.selectFields.map(field => `    ? /* ${field.description} */`).join(",\n");
+          const sql = `INSERT INTO ${fullTableName}\n(\n${insertColumns}\n)\nVALUES\n(\n${insertValues}\n);`;
+          insertSqlHtml += `<pre>${sql}</pre>`;
+        } else {
+          insertSqlHtml += `<pre>-- 此資料表沒有選擇要插入的欄位</pre>`;
+        }
+        insertSqlHtml += `</div>`;
+      });
+
+      document.getElementById("selectSql").innerHTML = selectSqlHtml;
+      document.getElementById("updateSql").innerHTML = updateSqlHtml;
+      document.getElementById("insertSql").innerHTML = insertSqlHtml;
+    }
+
+    function generateJoinSQL(tableGroups) {
+      // 依 joinOrder 排序
+      const tables = joinOrder
+        .map(key => tableGroups[key])
+        .filter(Boolean)
+        .concat(
+          Object.values(tableGroups).filter(
+            g => !joinOrder.includes(`${g.schemaName}.${g.tableName}`)
+          )
+        );
+      if (tables.length < 2) {
+        document.getElementById("selectSql").innerHTML = "<pre>-- 請選擇兩個以上資料表並指定 JOIN KEY</pre>";
+        document.getElementById("insertSql").innerHTML = "";
+        return;
+      }
+
+      const fromTable = tables[0]; // <--- 加這一行
+      const whereConds = []; // Initialize whereConds as an empty array
+      tables.forEach(table => {
+        table.whereFields.forEach(field => {
+          whereConds.push(`[${table.tableName}].[${field.fieldName}] = ? /* ${field.description} */`);
+        });
+      });
+
+      // 1. 收集所有 join key 欄位，依欄位名稱分組
+      const joinKeyMap = {};
+      tables.forEach(table => {
+        table.joinKeyFields.forEach(jk => {
+          if (!joinKeyMap[jk.fieldName]) joinKeyMap[jk.fieldName] = [];
+          joinKeyMap[jk.fieldName].push(table.tableName);
+        });
+      });
+
+      // 2. 只取在所有資料表都出現的 join key 欄位
+      const validJoinKeys = Object.keys(joinKeyMap)
+        .filter(fieldName => joinKeyMap[fieldName].length === tables.length);
+
+      // 檢查是否有有效的 join key
+      if (validJoinKeys.length === 0) {
+        document.getElementById("selectSql").innerHTML = "<pre>-- 無有效的 JOIN KEY，請檢查選擇的欄位</pre>";
+        document.getElementById("updateSql").innerHTML = "<pre>-- 無有效的 JOIN KEY，無法生成 UPDATE 語法</pre>";
+        return;
+      }
+
+      // 3. 組合 SELECT 欄位
+      let selectCols = [];
+      tables.forEach(table => {
+        table.selectFields.forEach(f => {
+          selectCols.push(`[${table.tableName}].[${f.fieldName}]`);
+        });
+      });
+
+      // 6. 組合 SELECT SQL
+      const joinClauses = []; // Initialize joinClauses as an empty array
+      for (let i = 1; i < tables.length; i++) {
+        const leftTable = tables[i - 1];
+        const rightTable = tables[i];
+        const commonJoinKeys = validJoinKeys.map(fieldName =>
+          `[${leftTable.tableName}].[${fieldName}] = [${rightTable.tableName}].[${fieldName}]`
+        ).join(" AND ");
+        if (commonJoinKeys) {
+          joinClauses.push(`JOIN [${rightTable.schemaName}].[${rightTable.tableName}] ON ${commonJoinKeys}`);
+        }
+      }
+      let sql = "";
+      if (selectCols.length > 0) {
+        sql = `SELECT\n  ${selectCols.join(",\n  ")}\nFROM [${fromTable.schemaName}].[${fromTable.tableName}]\n`;
+        if (joinClauses.length > 0) sql += joinClauses.join("\n") + "\n";
+        if (whereConds.length > 0) sql += "WHERE\n  " + whereConds.join("\n  AND ") + "\n";
+        sql += ";";
+      } else {
+        sql = "-- 請至少選擇一個欄位為 SELECT";
+      }
+
+      document.getElementById("selectSql").innerHTML = `<pre>${sql}</pre>`;
+
+      // 7. 組合 UPDATE SQL（鏈式 SET 與 JOIN）
+      let updateSets = [];
+      for (let i = 0; i < tables.length - 1; i++) {
+        const leftTable = tables[i];
+        const rightTable = tables[i + 1];
+        // 兩表都選為 select 且欄位同名才產生 SET
+        leftTable.selectFields.forEach(f => {
+          if (rightTable.selectFields.some(ff => ff.fieldName === f.fieldName)) {
+            updateSets.push(`    [${leftTable.tableName}].[${f.fieldName}] = [${rightTable.tableName}].[${f.fieldName}]`);
+          }
+        });
+      }
+
+      // 鏈式 JOIN ON
+      let updateJoinClauses = [];
+      for (let i = 1; i < tables.length; i++) {
+        const leftTable = tables[i - 1];
+        const rightTable = tables[i];
+        // 找出兩表都選為 join key 且同名的欄位
+        const leftJoinKeys = leftTable.joinKeyFields.map(f => f.fieldName);
+        const rightJoinKeys = rightTable.joinKeyFields.map(f => f.fieldName);
+        const commonJoinKeys = leftJoinKeys.filter(key => rightJoinKeys.includes(key));
+        let joinConds = commonJoinKeys.map(fieldName =>
+          `[${leftTable.tableName}].[${fieldName}] = [${rightTable.tableName}].[${fieldName}]`
+        ).join(" AND ");
+        updateJoinClauses.push(`JOIN [${rightTable.schemaName}].[${rightTable.tableName}]${joinConds ? " ON " + joinConds : ""}`);
+      }
+
+      let updateSql = "";
+      if (updateSets.length > 0) {
+        updateSql = `UPDATE [${tables[0].schemaName}].[${tables[0].tableName}]\nSET\n${updateSets.join(",\n")}\nFROM [${tables[0].schemaName}].[${tables[0].tableName}]\n`;
+        if (updateJoinClauses.length > 0) updateSql += updateJoinClauses.join("\n") + "\n";
+        if (whereConds.length > 0) updateSql += "WHERE\n  " + whereConds.join("\n  AND ") + "\n";
+        updateSql += ";";
+      } else {
+        updateSql = "-- 只有每兩表都選為 SELECT 且欄位同名才會產生 SET";
+      }
+
+      document.getElementById("updateSql").innerHTML = `<pre>${updateSql}</pre>`;
+
+      // 8. 組合 INSERT SQL（只產生沒有 join key 的表）
+      let insertSqlHtml = "";
+      tables.forEach(table => {
+        if (table.joinKeyFields.length === 0 && table.selectFields.length > 0) {
+          const fullTableName = `[${table.schemaName}].[${table.tableName}]`;
+          const insertColumns = table.selectFields.map(field => `    [${field.fieldName}]`).join(",\n");
+          const insertValues = table.selectFields.map(field => `    ? /* ${field.description} */`).join(",\n");
+          insertSqlHtml += `<div class="table-section">`;
+          insertSqlHtml += `<div class="table-title">➕ ${table.schemaName}.${table.tableName}</div>`;
+          insertSqlHtml += `<pre>INSERT INTO ${fullTableName}\n(\n${insertColumns}\n)\nVALUES\n(\n${insertValues}\n);</pre>`;
+          insertSqlHtml += `</div>`;
+        }
+      });
+      if (!insertSqlHtml) {
+        insertSqlHtml = "<pre>-- 有 JOIN KEY 無法產生 INSERT 語法</pre>";
+      }
+      document.getElementById("insertSql").innerHTML = insertSqlHtml;
+
+
+
+    }
+
+    function getFieldDescription(fieldName, tableName, schemaName) {
+      const field = data.find(row => 
+        row["欄位名稱"] === fieldName && 
+        row["資料表名稱"] === tableName && 
+        row["Schema 名稱"] === schemaName
+      );
+      return field ? field["欄位說明"] : "";
+    }
+
+    function showTab(tabName) {
+      // 隱藏所有 tab
+      document.querySelectorAll(".tab-content").forEach(tab => tab.classList.remove("active"));
+      document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+
+      // 顯示選中的 tab
+      document.getElementById(tabName + "Tab").classList.add("active");
+      event.target.classList.add("active");
+    }
+
+    function copySql(type) {
+      const sqlElement = document.getElementById(type + "Sql");
+      let text = "";
+      
+      // 提取所有 pre 標籤中的文字
+      const preElements = sqlElement.querySelectorAll("pre");
+      if (preElements.length > 0) {
+        text = Array.from(preElements).map(pre => pre.textContent).join("\n\n");
+      } else {
+        text = sqlElement.textContent;
+      }
+      
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = event.target;
+        const originalText = btn.textContent;
+        const originalBg = btn.style.background;
+        btn.textContent = "✅ 已複製";
+        btn.style.background = "#27ae60";
+        
+        setTimeout(() => {
+          btn.textContent = originalText;
+          btn.style.background = originalBg;
+        }, 2000);
+      }).catch(() => {
+        // 如果 clipboard API 不可用，使用傳統方法
+        const textarea = document.createElement("textarea");
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+        
+        alert("SQL 已複製到剪貼簿！");
+      });
+    }
+
+    function downloadSql(type) {
+      const sqlElement = document.getElementById(type + "Sql");
+      let text = "";
+      
+      // 提取所有 pre 標籤中的文字
+      const preElements = sqlElement.querySelectorAll("pre");
+      if (preElements.length > 0) {
+        text = Array.from(preElements).map(pre => pre.textContent).join("\n\n");
+      } else {
+        text = sqlElement.textContent;
+      }
+      
+      // 建立一個隱藏的 a 標籤用於下載
+      const a = document.createElement("a");
+      const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      a.href = url;
+      a.download = `${type}_sql_${new Date().toISOString().slice(0, 10)}.sql`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+  </script>
+
+</body>
+</html>
