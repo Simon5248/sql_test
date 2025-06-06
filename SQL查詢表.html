@@ -1030,11 +1030,23 @@
       URL.revokeObjectURL(url);
     }
 
+    function getSqlHeader(fullTableName, columnName = "") {
+      // 若有 columnName 則加到 tableName 後面
+      let objName = fullTableName;
+      if (columnName) objName += `.[${columnName}]`;
+      const pad = (s) => s + " ".repeat(Math.max(0, 60 - s.length));
+      return (
+        pad(`/****** Object:  Table ${objName} ******/`) + "\n" +
+        pad(`/****** Script Date: 2025/6/7 上午 01:55:06 ******/`) + "\n" +
+        pad(`/****** Author: Simon Hsu ******/`) + "\n" +
+        pad(`/****** 本檔案由 B2B資料表欄位中英對照查詢系統自動產生，請依實際需求調整 ******/`) + "\n"
+      );
+    }
+
     function generateCreateTableSQL(tableGroup) {
       const fullTableName = `[${tableGroup.schemaName}].[${tableGroup.tableName}]`;
       const typesWithLength = ["nvarchar", "varchar", "char", "nchar", "binary", "varbinary"];
       const columns = tableGroup.selectFields.map(field => {
-        // 只有特定型別才加 (長度)
         let typeStr = field.dataType;
         if (
           typesWithLength.includes((field.dataType || "").toLowerCase()) &&
@@ -1050,13 +1062,12 @@
         col += ` /* ${field.description} */`;
         return col;
       }).join(",\n");
-      return `CREATE TABLE ${fullTableName} (\n${columns}\n);`;
+      return getSqlHeader(fullTableName) + `CREATE TABLE ${fullTableName} (\n${columns}\n);`;
     }
 
     function generateUpdateTableSQL(tableGroup) {
-      // 改為 DROP TABLE IF EXISTS 語法
       const fullTableName = `[${tableGroup.schemaName}].[${tableGroup.tableName}]`;
-      return `DROP TABLE IF EXISTS ${fullTableName};`;
+      return getSqlHeader(fullTableName) + `DROP TABLE IF EXISTS ${fullTableName};`;
     }
 
     function generateAddColumnSQL(tableGroup) {
@@ -1074,10 +1085,10 @@
         let col = `[${field.fieldName}] ${typeStr}`;
         if (field.isNullable === "否") col += " NOT NULL";
         let sql =
+          getSqlHeader(fullTableName) +
           `IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE Name = N'${field.fieldName}' AND Object_ID = Object_ID(N'${fullTableName}'))\n` +
           "BEGIN\n" +
           `  ALTER TABLE ${fullTableName} ADD ${col}; /* ${field.description} */\n`;
-        // 預設值需額外產生 DEFAULT CONSTRAINT
         if (field.defaultValue) {
           const constraint = `DF_${tableGroup.tableName}_${field.fieldName}`;
           sql += `  ALTER TABLE ${fullTableName} ADD CONSTRAINT ${constraint} DEFAULT ${field.defaultValue} FOR [${field.fieldName}];\n`;
@@ -1102,10 +1113,10 @@
         let col = `[${field.fieldName}] ${typeStr}`;
         if (field.isNullable === "否") col += " NOT NULL";
         let sql =
+          getSqlHeader(fullTableName) +
           `IF EXISTS (SELECT 1 FROM sys.columns WHERE Name = N'${field.fieldName}' AND Object_ID = Object_ID(N'${fullTableName}'))\n` +
           "BEGIN\n" +
           `  ALTER TABLE ${fullTableName} ALTER COLUMN ${col}; /* ${field.description} */\n`;
-        // 若有 defaultValue，先 drop default constraint 再 add
         if (field.defaultValue) {
           const constraint = `DF_${tableGroup.tableName}_${field.fieldName}`;
           sql +=
