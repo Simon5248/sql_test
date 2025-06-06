@@ -33,9 +33,55 @@ body {
       box-shadow: 0 2px 8px rgba(25, 118, 210, 0.12);
     }
 
+    /* 日期區間輸入框美化 */
+.input-row input[type="date"] {
+  padding: 8px 14px;
+  border: 2px solid #1976d2;
+  border-radius: 6px;
+  font-size: 16px;
+  margin-right: 8px;
+  background: #f8fafc;
+  color: #333;
+  transition: border 0.2s;
+}
+.input-row input[type="date"]:focus {
+  border: 2px solid #512da8;
+  outline: none;
+}
+
+/* Checkbox 美化 */
+.input-row label {
+  display: inline-flex;
+  align-items: center;
+  font-size: 15px;
+  margin-left: 10px;
+  cursor: pointer;
+  user-select: none;
+}
+.input-row input[type="checkbox"] {
+  accent-color: #1976d2;
+  width: 18px;
+  height: 18px;
+  margin-right: 6px;
+  cursor: pointer;
+}
+
+/* 讓整個 input-row 更整齊 */
+.input-row {
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center; /* 讓內容置中 */
+  text-align: initial;     /* 移除 text-align: left 或 center，避免影響 flex */
+}
+
     .controls {
       margin: 16px 0 20px 0;
       text-align: center;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 8px;
     }
 
     /* 讓輸入框區塊置中 */
@@ -71,6 +117,7 @@ body {
       box-shadow: 0 2px 4px rgba(25, 118, 210, 0.10);
       transition: background 0.2s, box-shadow 0.2s;
       letter-spacing: 0.5px;
+      display: inline-block;
     }
     .btn:hover, .btn:focus {
       background: #1565c0;

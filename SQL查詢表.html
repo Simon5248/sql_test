@@ -18,6 +18,13 @@
     <input type="text" id="searchInput2" placeholder="🔍 請輸入欄位名稱（英文）">
     <input type="text" id="searchInput3" placeholder="🔍 請輸入欄位中文說明（中文）">
   </div>
+  <div class="input-row">
+    <input type="date" id="changeTimeStart" placeholder="變更時間起">
+    <input type="date" id="changeTimeEnd" placeholder="變更時間迄">
+    <label>
+      <input type="checkbox" id="changeTimeNotNone"> 只顯示有變更時間
+    </label>
+  </div>
   <div class="controls">
     <button class="btn" onclick="selectAllForSelect()">🔍 全選為 SELECT</button>
     <button class="btn" onclick="selectAllForWhere()">🎯 全選為 WHERE</button>
@@ -127,6 +134,9 @@
     const input2 = document.getElementById("searchInput2");
     const input3 = document.getElementById("searchInput3");
     const input4 = document.getElementById("searchInput4");
+    const changeTimeStart = document.getElementById("changeTimeStart");
+    const changeTimeEnd = document.getElementById("changeTimeEnd");
+    const changeTimeNotNone = document.getElementById("changeTimeNotNone");
     const tbody = document.querySelector("#resultTable tbody");
     const queryDiv = document.getElementById("queryResult");
     let currentMatched = [];
@@ -260,15 +270,35 @@
           })
         )
       );
-      // 如果所有輸入框都是空的，filtered 保持為原始 data
-      
-      renderTable(filtered); // 渲染結果
+
+      // 變更時間區間查詢
+      if (changeTimeStart.value || changeTimeEnd.value) {
+        filtered = filtered.filter(row => {
+          const val = row["變更時間"];
+          if (!val || val === "無") return false;
+          // 只取日期部分
+          const dateStr = val.slice(0, 10);
+          if (changeTimeStart.value && dateStr < changeTimeStart.value) return false;
+          if (changeTimeEnd.value && dateStr > changeTimeEnd.value) return false;
+          return true;
+        });
+      }
+
+      // 只顯示有變更時間（不為"無"）
+      if (changeTimeNotNone.checked) {
+        filtered = filtered.filter(row => row["變更時間"] && row["變更時間"] !== "無");
+      }
+
+      renderTable(filtered);
     }
 
     input.addEventListener("input", filterData);
     input2.addEventListener("input", filterData);
     input3.addEventListener("input", filterData);
     input4.addEventListener("input", filterData);
+    changeTimeStart.addEventListener("input", filterData);
+    changeTimeEnd.addEventListener("input", filterData);
+    changeTimeNotNone.addEventListener("change", filterData);
 
     function handleFieldSelection(e) {
       e.stopPropagation();
