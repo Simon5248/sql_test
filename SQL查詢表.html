@@ -1085,7 +1085,7 @@
         let col = `[${field.fieldName}] ${typeStr}`;
         if (field.isNullable === "否") col += " NOT NULL";
         let sql =
-          getSqlHeader(fullTableName) +
+          getSqlHeader(fullTableName,field.fieldName) +
           `IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE Name = N'${field.fieldName}' AND Object_ID = Object_ID(N'${fullTableName}'))\n` +
           "BEGIN\n" +
           `  ALTER TABLE ${fullTableName} ADD ${col}; /* ${field.description} */\n`;
@@ -1113,7 +1113,7 @@
         let col = `[${field.fieldName}] ${typeStr}`;
         if (field.isNullable === "否") col += " NOT NULL";
         let sql =
-          getSqlHeader(fullTableName) +
+          getSqlHeader(fullTableName,field.fieldName) +
           `IF EXISTS (SELECT 1 FROM sys.columns WHERE Name = N'${field.fieldName}' AND Object_ID = Object_ID(N'${fullTableName}'))\n` +
           "BEGIN\n" +
           `  ALTER TABLE ${fullTableName} ALTER COLUMN ${col}; /* ${field.description} */\n`;
