@@ -1077,7 +1077,15 @@
         pkConstraint = `,  CONSTRAINT [PK_${tableGroup.tableName}] PRIMARY KEY CLUSTERED \n  (${pkFields.join(",\n   ")})\n  WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]`;
       }
 
-      // 4. 組合欄位註解語法
+      // 4. 組合資料表註解（只取第一個欄位的資料表說明，或你可自行調整來源）
+      let tableComment = "";
+      if (tableGroup.selectFields.length > 0 && tableGroup.selectFields[0].tableDescription) {
+        const desc = tableGroup.selectFields[0].tableDescription.replace(/'/g, "''");
+        tableComment =
+          `EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'${desc}' , @level0type=N'SCHEMA',@level0name=N'${tableGroup.schemaName}', @level1type=N'TABLE',@level1name=N'${tableGroup.tableName}'\nGO\n`;
+      }
+
+      // 5. 組合欄位註解語法
       const comments = tableGroup.selectFields
         .filter(field => field.description && field.description.trim())
         .map(field =>
@@ -1088,6 +1096,7 @@
       return (
         getSqlHeader(fullTableName) +
         `CREATE TABLE ${fullTableName} (\n${columns}${pkConstraint}\n) ON [PRIMARY];\n\n` +
+        tableComment +
         comments
       );
     }
