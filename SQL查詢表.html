@@ -605,7 +605,8 @@
           isNullable: origin ? origin["是否可為NULL"] : "",
           defaultValue: origin ? origin["預設值"] : "",
           isPK: origin ? origin["PK"] : "",
-          description: origin ? origin["欄位說明"] : ""
+          description: origin ? origin["欄位說明"] : "",
+          tableDescription: origin ? origin["資料表說明"] : "" // <--- 這一行
         };
         if (fieldInfo.type === "select") {
           tableGroups[tableKey].selectFields.push(fieldFull);
