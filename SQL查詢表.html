@@ -1132,10 +1132,10 @@
         }
         // 新增註解
         if (field.description && field.description.trim()) {
-          sql += `  EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'${field.description.replace(/'/g, "''")}' , @level0type=N'SCHEMA',@level0name=N'${tableGroup.schemaName}', @level1type=N'TABLE',@level1name=N'${tableGroup.tableName}', @level2type=N'COLUMN',@level2name=N'${field.fieldName}'\n`;
-          sql += `  GO\n`;
+          sql += `  EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'${field.description.replace(/'/g, "''")}' , @level0type=N'SCHEMA',@level0name=N'${tableGroup.schemaName}', @level1type=N'TABLE',@level1name=N'${tableGroup.tableName}', @level2type=N'COLUMN',@level2name=N'${field.fieldName}'\n`;          
         }
-        sql += "END";
+        sql += `END\n`;
+        sql += `GO\n`;
         return sql;
       }).join("\n");
     }
@@ -1173,9 +1173,9 @@
         // 更新註解
         if (field.description && field.description.trim()) {
           sql += `  EXEC sys.sp_updateextendedproperty @name=N'MS_Description', @value=N'${field.description.replace(/'/g, "''")}' , @level0type=N'SCHEMA',@level0name=N'${tableGroup.schemaName}', @level1type=N'TABLE',@level1name=N'${tableGroup.tableName}', @level2type=N'COLUMN',@level2name=N'${field.fieldName}'\n`;
-          sql += `  GO\n`;
         }
-        sql += "END";
+        sql += `END\n`;
+        sql += `GO\n`;
         return sql;
       }).join("\n");
     }
