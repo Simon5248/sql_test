@@ -1046,6 +1046,7 @@
     function generateCreateTableSQL(tableGroup) {
       const fullTableName = `[${tableGroup.schemaName}].[${tableGroup.tableName}]`;
       const typesWithLength = ["nvarchar", "varchar", "char", "nchar", "binary", "varbinary"];
+      // 1. 產生欄位定義
       const columns = tableGroup.selectFields.map(field => {
         let typeStr = field.dataType;
         if (
@@ -1058,11 +1059,37 @@
         let col = `  [${field.fieldName}] ${typeStr}`;
         if (field.isNullable === "否") col += " NOT NULL";
         if (field.defaultValue) col += ` DEFAULT ${field.defaultValue}`;
-        if (field.isPK === "是") col += " PRIMARY KEY";
+        // 不在這裡加 PRIMARY KEY
         col += ` /* ${field.description} */`;
         return col;
       }).join(",\n");
-      return getSqlHeader(fullTableName) + `CREATE TABLE ${fullTableName} (\n${columns}\n);`;
+
+      // 2. 找出所有 PK 欄位
+      const pkFields = tableGroup.selectFields
+        .filter(field => field.isPK === "是")
+        .map(field => `[${field.fieldName}] ASC`);
+
+      // 3. 組合 PK constraint
+      let pkConstraint = "";
+      if (pkFields.length === 1) {
+        pkConstraint = `,  CONSTRAINT [PK_${tableGroup.tableName}] PRIMARY KEY CLUSTERED \n  (${pkFields[0]})\n  WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]`;
+      } else if (pkFields.length > 1) {
+        pkConstraint = `,  CONSTRAINT [PK_${tableGroup.tableName}] PRIMARY KEY CLUSTERED \n  (${pkFields.join(",\n   ")})\n  WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]`;
+      }
+
+      // 4. 組合欄位註解語法
+      const comments = tableGroup.selectFields
+        .filter(field => field.description && field.description.trim())
+        .map(field =>
+          `EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'${field.description.replace(/'/g, "''")}' , @level0type=N'SCHEMA',@level0name=N'${tableGroup.schemaName}', @level1type=N'TABLE',@level1name=N'${tableGroup.tableName}', @level2type=N'COLUMN',@level2name=N'${field.fieldName}'\nGO`
+        )
+        .join("\n");
+
+      return (
+        getSqlHeader(fullTableName) +
+        `CREATE TABLE ${fullTableName} (\n${columns}${pkConstraint}\n) ON [PRIMARY];\n\n` +
+        comments
+      );
     }
 
     function generateUpdateTableSQL(tableGroup) {
