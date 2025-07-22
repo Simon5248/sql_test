@@ -746,6 +746,8 @@
 
       Object.keys(tableGroups).forEach(tableKey => {
         const group = tableGroups[tableKey];
+        const fullTableName = `[${group.schemaName}].[${group.tableName}]`; // <-- 加這一行
+
         selectSqlHtml += `<div class="table-section">`;
         selectSqlHtml += `<div class="table-title">📋 ${group.schemaName}.${group.tableName}</div>`;
 
